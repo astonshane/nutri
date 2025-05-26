@@ -1,0 +1,15 @@
+class Serving:
+    def __init__(self, body):
+        self.id = body.get('serving_id')
+        self.description = body.get('serving_description')
+        self.metric_serving_amount = body.get('metric_serving_amount')
+        self.metric_serving_unit = body.get('metric_serving_unit')
+        self.number_of_units = body.get('number_of_units')
+        self.calories = body.get('calories')
+        self.carbohydrate = body.get('carbohydrate')
+        self.protein = body.get('protein')
+        self.fat = body.get('fat')
+        self.cholesterol = body.get('cholesterol')
+        self.sodium = body.get('sodium')
+        self.fiber = body.get('fiber')
+        self.sugar = body.get('sugar')

@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 import os
-from fatsecret import Fatsecret
-from flask import Flask, render_template
+from fatsecret.fatsecret import Fatsecret
+from flask import Flask, request, render_template
     
 load_dotenv()
 fs = Fatsecret(os.getenv("FATSECRET_CLIENT_ID"), os.getenv("FATSECRET_CLIENT_SECRET"))
@@ -9,12 +9,15 @@ app = Flask(__name__)
 
 @app.route("/")
 def hello_world():
-    return "hello world"
+    return render_template('index.html')
 
-@app.route("/search/<search_expression>")
-def search(search_expression):
+@app.route("/search", methods=["GET", "POST"])
+def ingredient_search():
+    search_expression = "apple"
+    if request.method == "POST":
+        search_expression = request.form.get("search_expression", search_expression)
     results = fs.search(search_expression, max_results=50, page_number=0)
-    return render_template('search.html', search_expression=search_expression, results=results)
+    return render_template('search.html', search_expression=search_expression, foods=results)
 
 @app.route("/food/<int:food_id>")
 def food(food_id):

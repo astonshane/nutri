@@ -1,0 +1,18 @@
+<table>
+    <thead>
+        <tr>
+        <th>name</th>
+        <th>brand</th>
+        <th>url</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for food in foods %}
+        <tr>
+            <td><a href="{{ url_for('food', food_id=food.id) }}">{{ food.name }}</a></td>
+            <td>{{ food.brand }}</td>
+            <td><a href="{{ food.url }}">{{ food.url }}</a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

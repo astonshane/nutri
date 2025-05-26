@@ -1,12 +1,43 @@
-<!doctype html>
-<title>{{ food.name }}</title>
-<h1>{{ food.name }}</h1>
-<p>Type: {{ food.type }}</p>
+{% extends 'base.html' %}
 
-{% for serving in food.servings %}
-    <h2>{{ serving.description }}</h2>
-    <p>Calories: {{ serving.calories }}</p>
-    <p>Carbohydrates: {{ serving.carbohydrates }}g</p>
-    <p>Fat: {{ serving.fat }}g</p>
-    <p>Protein: {{ serving.protein }}g</p>
-{% endfor %}
+{% block title %}Home{% endblock %}
+
+{% block header %}
+<h1>{{ food.name }} ({{ food.brand }})</h1>
+{% endblock %}
+
+{% block content %}
+Serving Size Options:
+<table>
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Description</th>
+            <th>Calories</th>
+            <th>Carbohydrate</th>
+            <th>Protein</th>
+            <th>Fat</th>
+            <th>Cholesterol</th>
+            <th>Sodium</th>
+            <th>Fiber</th>
+            <th>Sugar</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for serving in food.servings %}
+        <tr>
+            <td>{{ serving.id }}</td>
+            <td>{{ serving.description }}</td>
+            <td>{{ serving.calories }}</td>
+            <td>{{ serving.carbohydrate }}</td>
+            <td>{{ serving.protein }}</td>
+            <td>{{ serving.fat }}</td>
+            <td>{{ serving.cholesterol }}</td>
+            <td>{{ serving.sodium }}</td>
+            <td>{{ serving.fiber }}</td>
+            <td>{{ serving.sugar }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
