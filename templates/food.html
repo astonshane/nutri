@@ -1,0 +1,12 @@
+<!doctype html>
+<title>{{ food.name }}</title>
+<h1>{{ food.name }}</h1>
+<p>Type: {{ food.type }}</p>
+
+{% for serving in food.servings %}
+    <h2>{{ serving.description }}</h2>
+    <p>Calories: {{ serving.calories }}</p>
+    <p>Carbohydrates: {{ serving.carbohydrates }}g</p>
+    <p>Fat: {{ serving.fat }}g</p>
+    <p>Protein: {{ serving.protein }}g</p>
+{% endfor %}
