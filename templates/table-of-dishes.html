@@ -1,0 +1,18 @@
+<table class="table table-striped">
+    <thead>
+        <tr>
+        <th>uuid</th>
+        <th>title</th>
+        <th>description</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for dish in dishes %}
+        <tr>
+            <td>{{ dish.uuid }}</td>
+            <td>{{ dish.title }}</td>
+            <td>{{ dish.description }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
