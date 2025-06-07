@@ -4,7 +4,10 @@ from fatsecret.token import Token
 
 
 class Fatsecret:
-    def __init__(self, client_id, client_secret):
+    def __init__(self):
+        pass
+
+    def setToken(self, client_id, client_secret):
         self.token = Token(client_id, client_secret)
 
     def request(self, path, params):

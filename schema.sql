@@ -1,5 +1,0 @@
-CREATE TABLE IF NOT EXISTS dishes (
-	uuid TEXT PRIMARY KEY,
-	title TEXT NOT NULL,
-	description TEXT NOT NULL
-);
