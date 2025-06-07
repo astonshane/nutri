@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-# from fatsecret import Fatsecret
+# from .fatsecret.fatsecret import Fatsecret
 
 db = SQLAlchemy()
 # fs = Fatsecret()

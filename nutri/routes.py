@@ -13,6 +13,23 @@ def list_dishes():
 def index():
     return render_template('index.html', dishes=list_dishes())
 
+@app.route("/dish/<int:id>", methods=["GET"])
+def dish(id):        
+    dish = db.session.get(Dish, id)
+    if not dish:
+        return make_response("Dish not found", 404)
+    return render_template('dish.html', dish=dish)
+
+@app.route("/dish/<int:id>/delete", methods=["POST"])
+def delete_dish(id):
+    dish = db.session.get(Dish, id)
+    if not dish:
+        return make_response("Dish not found", 404)
+    db.session.delete(dish)
+    db.session.commit()
+    # set flash message?
+    return redirect(url_for("dishes"))
+
 @app.route("/dishes", methods=["GET", "POST"])
 def dishes():
     if request.method == "POST":
@@ -23,7 +40,7 @@ def dishes():
         )
         db.session.add(dish)
         db.session.commit()
-        # return redirect(url_for("user_detail", id=user.id))
+        return redirect(url_for("dish", id=dish.id))
 
     dishes = list_dishes()
     return render_template('dishes.html', dishes=dishes)

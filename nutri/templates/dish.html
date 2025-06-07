@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{{dish.title}}
+{% endblock %}
+
+{% block header %}
+<h1>{{dish.title}}</h1>
+{% endblock %}
+
+{% block content %}
+
+<p>
+    {{dish.description}}
+</p>
+
+{% include 'forms/dish-delete.html' %}
+
+{% endblock %}
+

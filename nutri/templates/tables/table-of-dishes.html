@@ -1,7 +1,6 @@
 <table class="table table-striped">
     <thead>
         <tr>
-        <th>uuid</th>
         <th>title</th>
         <th>description</th>
         </tr>
@@ -9,9 +8,13 @@
     <tbody>
         {% for dish in dishes %}
         <tr>
-            <td>{{ dish.id }}</td>
-            <td>{{ dish.title }}</td>
+            <td>
+                <a href="{{ url_for('dish', id=dish.id) }}">{{ dish.title }}</a>
+            </td>
             <td>{{ dish.description }}</td>
+            <td>
+                {% include 'forms/dish-delete.html' %}
+            </td>
         </tr>
         {% endfor %}
     </tbody>
