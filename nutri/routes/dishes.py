@@ -12,8 +12,6 @@ def dish(id):
     dish = db.session.get(Dish, id)
     if not dish:
         return make_response("Dish not found", 404)
-    print(dish)
-    print(dish.ingredients)
     return render_template('dish.html', dish=dish)
 
 @app.route("/dish/<int:id>/delete", methods=["POST"])
@@ -29,7 +27,6 @@ def delete_dish(id):
 @app.route("/dishes", methods=["GET", "POST"])
 def dishes():
     if request.method == "POST":
-        print(request.form)
         dish = Dish(
             title=request.form["title"],
             description=request.form["description"],
@@ -41,7 +38,6 @@ def dishes():
     dishes = list_dishes()
     return render_template('dishes.html', dishes=dishes)
 
-# not a real route - just a POC for the insert logic
 @app.route("/dishes/<int:id>/ingredients/<int:food_id>/<int:serving_id>/insert", methods=["POST"])
 def insert_ingredient(id, food_id, serving_id):
     dish = db.session.get(Dish, id)
@@ -49,13 +45,23 @@ def insert_ingredient(id, food_id, serving_id):
     ingredient = Ingredient(
         food_id=food_id,
         serving_id=serving_id,
-        quantity=int(request.form['quantity']),
+        quantity=float(request.form['quantity']),
         dish_id=dish.id
     )
     db.session.add(ingredient)
     db.session.commit()
     
     return redirect(url_for("dish", id=dish.id))
+
+@app.route("/dishes/ingredients/<int:id>/delete", methods=["POST"])
+def delete_ingredient(id):
+    ingredient = db.session.get(Ingredient, id)
+    dish = ingredient.dish
+    db.session.delete(ingredient)
+    db.session.commit()
+    
+    return redirect(url_for("dish", id=dish.id))
+
 
 @app.route("/dishes/<int:id>/ingredients", methods=["GET", "POST"])
 def search_ingredients(id):
@@ -74,5 +80,4 @@ def search_ingredients(id):
 def food(id, food_id):
     dish = db.session.get(Dish, id)
     result = fs.food(food_id)
-    # print(f"Food ID: {food_id}, Result: {result}")
     return render_template('food.html', dish=dish, food=result)

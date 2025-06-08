@@ -1,4 +1,4 @@
-<table class="table table-striped">
+<table class="table table-striped table-hover">
     <thead>
         <tr>
         <th>Name</th>
@@ -10,6 +10,7 @@
         <th>Carbohydrates</th>
         <th>Fiber</th>
         <th>Protein</th>
+        <th></th>
         </tr>
     </thead>
     <tbody>
@@ -28,6 +29,7 @@
             <td>{{ingredient.nutrition(True)['carbohydrates']}}</td>
             <td>{{ingredient.nutrition(True)['fiber']}}</td>
             <td>{{ingredient.nutrition(True)['protein']}}</td>
+            <td>{% include 'forms/ingredient-delete.html' %}</td>
         </tr>
         <tr>
             <td></td>
@@ -39,6 +41,7 @@
             <td>{{ingredient.nutrition()['carbohydrates']}}</td>
             <td>{{ingredient.nutrition()['fiber']}}</td>
             <td>{{ingredient.nutrition()['protein']}}</td>
+            <td></td>
         </tr>
         {% endfor %}
         <tr>
@@ -51,6 +54,7 @@
             <td>{{dish.nutrition()['carbohydrates']}}</td>
             <td>{{dish.nutrition()['fiber']}}</td>
             <td>{{dish.nutrition()['protein']}}</td>
+            <td></td>
         </tr>
     </tbody>
 </table>

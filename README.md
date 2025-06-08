@@ -5,3 +5,4 @@
 * `source .venv/bin/activate`
 * `pip install -r requirements.txt`
 * `flask --app main run --debug`
+* `flask --app app run`

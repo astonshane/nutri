@@ -70,8 +70,6 @@ class Ingredient(db.Model):
 
         s = self.serving()
         mult = 1 if per_serving else self.quantity
-        print(f"Calculating nutrition for ingredient {self.food().name} with quantity {self.quantity} and per_serving={per_serving}")
-        print(f"Serving: {s.description}, Multiplier: {mult}")
         n = {
             'calories': s.calories * mult,
             'fat': s.fat * mult,

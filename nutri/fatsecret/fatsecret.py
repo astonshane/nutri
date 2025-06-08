@@ -33,8 +33,6 @@ class Fatsecret:
             'page_number': page_number
         }
         results_json = self.request(path, params)
-        for food in results_json['foods']['food']:
-            print(food)
         results = [Food(item) for item in results_json['foods']['food']]
         return results
     
@@ -45,5 +43,4 @@ class Fatsecret:
             'format': 'json'
         }
         results_json = self.request(path, params)
-        # print(results_json)
         return Food(results_json['food'])

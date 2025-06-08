@@ -15,10 +15,7 @@ class Food:
     
     def serving(self, serving_id):
         serving_id = str(serving_id)
-        print(f"Searching for serving with ID: {serving_id} in food {self.id}")
         for serving in self.servings:
-            print(type(serving_id), serving_id, type(serving.id), serving.id)
             if serving.id == serving_id:
-                print(f"Found serving: {serving}")
                 return serving
         return None
