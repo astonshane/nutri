@@ -1,9 +1,9 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-# from .fatsecret.fatsecret import Fatsecret
+from .fatsecret.fatsecret import Fatsecret
 
 db = SQLAlchemy()
-# fs = Fatsecret()
+fs = Fatsecret()
 
 
 def create_app():
@@ -13,9 +13,12 @@ def create_app():
 
     # Initialize Database Plugin
     db.init_app(app)
+    fs.setToken(app.config['FATSECRET_CLIENT_ID'], app.config['FATSECRET_CLIENT_SECRET'])
 
     with app.app_context():
-        from . import routes  # Import routes
+        # Import routes
+        from .routes import main  
+        from .routes import dishes
 
         db.create_all()  # Create database tables for our data models
 

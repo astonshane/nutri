@@ -1,0 +1,8 @@
+<form action="{{ url_for('insert_ingredient', id=dish.id, food_id=food.id, serving_id=serving.id)}}" method="post">
+    <div class="form-group">
+            <input class="form-control" type="text" id="quantity" name="quantity" placeholder="quantity" required>
+        </div>
+    <button type="submit" class="btn btn-primary">
+        <span class="glyphicon glyphicon-plus"></span>
+    </button>
+</form>

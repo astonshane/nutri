@@ -1,0 +1,56 @@
+<table class="table table-striped">
+    <thead>
+        <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Quantity</th>
+        <th>Calories</th>
+        <th>Fat</th>
+        <th>Sodium</th>
+        <th>Carbohydrates</th>
+        <th>Fiber</th>
+        <th>Protein</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for ingredient in dish.ingredients %}
+        <tr>
+            <td>
+                <a href="{{ingredient.food().url}}">
+                    {{ingredient.food().name}}
+                </a>
+            </td>
+            <td>{{ingredient.serving().description}}</td>
+            <td>{{ingredient.quantity}}</td>
+            <td>{{ingredient.nutrition(True)['calories']}}</td>
+            <td>{{ingredient.nutrition(True)['fat']}}</td>
+            <td>{{ingredient.nutrition(True)['sodium']}}</td>
+            <td>{{ingredient.nutrition(True)['carbohydrates']}}</td>
+            <td>{{ingredient.nutrition(True)['fiber']}}</td>
+            <td>{{ingredient.nutrition(True)['protein']}}</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>{{ingredient.nutrition()['calories']}}</td>
+            <td>{{ingredient.nutrition()['fat']}}</td>
+            <td>{{ingredient.nutrition()['sodium']}}</td>
+            <td>{{ingredient.nutrition()['carbohydrates']}}</td>
+            <td>{{ingredient.nutrition()['fiber']}}</td>
+            <td>{{ingredient.nutrition()['protein']}}</td>
+        </tr>
+        {% endfor %}
+        <tr>
+            <td>Total</td>
+            <td></td>
+            <td></td>
+            <td>{{dish.nutrition()['calories']}}</td>
+            <td>{{dish.nutrition()['fat']}}</td>
+            <td>{{dish.nutrition()['sodium']}}</td>
+            <td>{{dish.nutrition()['carbohydrates']}}</td>
+            <td>{{dish.nutrition()['fiber']}}</td>
+            <td>{{dish.nutrition()['protein']}}</td>
+        </tr>
+    </tbody>
+</table>

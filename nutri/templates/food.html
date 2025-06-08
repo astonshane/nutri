@@ -21,6 +21,7 @@ Serving Size Options:
             <th>Sodium</th>
             <th>Fiber</th>
             <th>Sugar</th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -36,6 +37,9 @@ Serving Size Options:
             <td>{{ serving.sodium }}</td>
             <td>{{ serving.fiber }}</td>
             <td>{{ serving.sugar }}</td>
+            <td>
+                {% include 'forms/add-serving.html' %}
+            </td>
         </tr>
         {% endfor %}
     </tbody>

@@ -1,6 +1,6 @@
 import requests
-from fatsecret.food import Food
-from fatsecret.token import Token
+from .food import Food
+from .token import Token
 
 
 class Fatsecret:
@@ -45,4 +45,5 @@ class Fatsecret:
             'format': 'json'
         }
         results_json = self.request(path, params)
+        # print(results_json)
         return Food(results_json['food'])
