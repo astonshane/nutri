@@ -53,13 +53,13 @@ class Ingredient(db.Model):
     
     def food(self):
         if self._food is None:
-            _food = fs.food(self.food_id)
-        return _food
+            self._food = fs.food(self.food_id)
+        return self._food
     
     def serving(self):
         if self._serving is None:
-            _serving = self.food().serving(self.serving_id)
-        return _serving
+            self._serving = self.food().serving(self.serving_id)
+        return self._serving
     
     def nutrition(self, per_serving=False):
         if per_serving and self._nutrition_per_serving is not None:
@@ -73,7 +73,7 @@ class Ingredient(db.Model):
         n = {
             'calories': s.calories * mult,
             'fat': s.fat * mult,
-            'sodium': s.sugar * mult,
+            'sodium': s.sodium * mult,
             'carbohydrates': s.carbohydrate * mult,
             'fiber': s.fiber * mult,
             'protein': s.protein * mult

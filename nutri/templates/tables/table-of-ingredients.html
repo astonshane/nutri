@@ -2,18 +2,19 @@
     <thead>
         <tr>
         <th>Name</th>
-        <th>Description</th>
-        <th>Quantity</th>
-        <th>Calories</th>
-        <th>Fat</th>
-        <th>Sodium</th>
-        <th>Carbohydrates</th>
-        <th>Fiber</th>
-        <th>Protein</th>
+        <th>Serving Description</th>
+        <th># of Servings</th>
+        <th>Calories (kcal)</th>
+        <th>Fat (g)</th>
+        <th>Sodium (mg)</th>
+        <th>Carbohydrates (g)</th>
+        <th>Fiber (g)</th>
+        <th>Protein (g)</th>
         <th></th>
         </tr>
     </thead>
     <tbody>
+        {% set nutrition_keys = ['calories', 'fat', 'sodium', 'carbohydrates', 'fiber', 'protein'] %}
         {% for ingredient in dish.ingredients %}
         <tr>
             <td>
@@ -23,24 +24,18 @@
             </td>
             <td>{{ingredient.serving().description}}</td>
             <td>{{ingredient.quantity}}</td>
-            <td>{{ingredient.nutrition(True)['calories']}}</td>
-            <td>{{ingredient.nutrition(True)['fat']}}</td>
-            <td>{{ingredient.nutrition(True)['sodium']}}</td>
-            <td>{{ingredient.nutrition(True)['carbohydrates']}}</td>
-            <td>{{ingredient.nutrition(True)['fiber']}}</td>
-            <td>{{ingredient.nutrition(True)['protein']}}</td>
+            {% for key in nutrition_keys %}
+                <td>{{ingredient.nutrition(True)[key] | round | int }}</td>
+            {% endfor %}
             <td>{% include 'forms/ingredient-delete.html' %}</td>
         </tr>
         <tr>
             <td></td>
             <td></td>
             <td></td>
-            <td>{{ingredient.nutrition()['calories']}}</td>
-            <td>{{ingredient.nutrition()['fat']}}</td>
-            <td>{{ingredient.nutrition()['sodium']}}</td>
-            <td>{{ingredient.nutrition()['carbohydrates']}}</td>
-            <td>{{ingredient.nutrition()['fiber']}}</td>
-            <td>{{ingredient.nutrition()['protein']}}</td>
+            {% for key in nutrition_keys %}
+                <td>{{ingredient.nutrition()[key] | round | int }}</td>
+            {% endfor %}
             <td></td>
         </tr>
         {% endfor %}
@@ -48,12 +43,9 @@
             <td>Total</td>
             <td></td>
             <td></td>
-            <td>{{dish.nutrition()['calories']}}</td>
-            <td>{{dish.nutrition()['fat']}}</td>
-            <td>{{dish.nutrition()['sodium']}}</td>
-            <td>{{dish.nutrition()['carbohydrates']}}</td>
-            <td>{{dish.nutrition()['fiber']}}</td>
-            <td>{{dish.nutrition()['protein']}}</td>
+            {% for key in nutrition_keys %}
+                <td>{{dish.nutrition()[key] | round | int }}</td>
+            {% endfor %}
             <td></td>
         </tr>
     </tbody>

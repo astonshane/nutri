@@ -43,4 +43,5 @@ class Fatsecret:
             'format': 'json'
         }
         results_json = self.request(path, params)
+        # print(results_json)
         return Food(results_json['food'])
