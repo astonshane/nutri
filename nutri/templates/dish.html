@@ -5,21 +5,43 @@
 {% endblock %}
 
 {% block header %}
-<h1>{{dish.title}}</h1>
-{% include 'forms/dish-delete.html' %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-4 bg-light border">
+            <div class="jumbotron">
+                <h1 class="display-4">{{dish.title}}</h1>
+                <p class="lead">{{dish.description}}</p>
+                <p class="lead">
+                    {% include 'forms/dish-delete.html' %}
+                </p>
+            </div>
+        </div>
+        <div class="col-md-4 bg-light border">
+            <h2>Total Nutrition:</h2>
+            <ul class="list-group list-group-flush">
+            {% set nutrition_keys = ['calories', 'fat', 'sodium', 'carbohydrates', 'fiber', 'protein'] %}
+            {% for key in nutrition_keys %}
+                <li class="list-group-item">{{key}}: {{dish.nutrition()[key] | round | int }}</li>
+            {% endfor %}
+            </ul>
+        </div>
+        <div class="col-md-4 bg-light border">
+            <h2>Nutrition per Serving (4):</h2>
+            <ul class="list-group list-group-flush">
+            {% set nutrition_keys = ['calories', 'fat', 'sodium', 'carbohydrates', 'fiber', 'protein'] %}
+            {% for key in nutrition_keys %}
+                {% set per_serving = dish.nutrition()[key] / 4 %}
+                <li class="list-group-item">{{key}}: {{per_serving | round | int}}</li>
+            {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block content %}
 
-<p>
-    {{dish.description}}
-</p>
-
 {% include 'tables/table-of-ingredients.html' %}
-
-
-
-
 
 <form class="navbar-form navbar-left" action="{{ url_for('search_ingredients', id=dish.id)}}" method="post">
         <div class="form-group">
