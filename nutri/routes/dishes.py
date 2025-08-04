@@ -24,12 +24,22 @@ def delete_dish(id):
     # set flash message?
     return redirect(url_for("dishes"))
 
+@app.route("/dish/<int:id>/update", methods=["POST"])
+def update_dish(id):
+    dish = db.session.get(Dish, id)
+    if not dish:
+        return make_response("Dish not found", 404)
+    dish.servings = request.form.get("servings")
+    db.session.commit()
+    return redirect(url_for("dish", id=dish.id))
+
 @app.route("/dishes", methods=["GET", "POST"])
 def dishes():
     if request.method == "POST":
         dish = Dish(
             title=request.form["title"],
             description=request.form["description"],
+            servings = int(request.form.get("servings", 1))  # Default to 1 serving if not provided
         )
         db.session.add(dish)
         db.session.commit()
