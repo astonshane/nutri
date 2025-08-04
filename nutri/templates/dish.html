@@ -26,11 +26,11 @@
             </ul>
         </div>
         <div class="col-md-4 bg-light border">
-            <h2>Nutrition per Serving (4):</h2>
+            <h2>Nutrition per Serving ({{dish.servings}}):</h2>
             <ul class="list-group list-group-flush">
             {% set nutrition_keys = ['calories', 'fat', 'sodium', 'carbohydrates', 'fiber', 'protein'] %}
             {% for key in nutrition_keys %}
-                {% set per_serving = dish.nutrition()[key] / 4 %}
+                {% set per_serving = dish.nutrition()[key] / dish.servings %}
                 <li class="list-group-item">{{key}}: {{per_serving | round | int}}</li>
             {% endfor %}
             </ul>
