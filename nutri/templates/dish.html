@@ -5,6 +5,11 @@
 {% endblock %}
 
 {% block header %}
+
+{% endblock %}
+
+{% block content %}
+
 <div class="container mt-5">
     <div class="row">
         <div class="col-md-6 bg-light border">
@@ -27,7 +32,7 @@
         </div> -->
         <div class="col-md-4 bg-light border">
             {% include 'forms/dish-update.html' %}
-            <h2>Nutrition per Portion:</h2>
+            <h3>Nutrition per Portion:</h3>
             <ul class="list-group list-group-flush">
             {% set nutrition_keys = ['calories', 'fat', 'sodium', 'carbohydrates', 'fiber', 'protein'] %}
             {% for key in nutrition_keys %}
@@ -38,9 +43,6 @@
         </div>
     </div>
 </div>
-{% endblock %}
-
-{% block content %}
 
 {% include 'tables/table-of-ingredients.html' %}
 

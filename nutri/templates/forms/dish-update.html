@@ -1,6 +1,6 @@
 <form action="{{ url_for('update_dish', id=dish.id)}}" method="post">
     <div class="form-group">
-        Portions:
+        <label for="portions"># of Portions</label>
         <input type="text" class="form-control" id="portions" name="portions" placeholder="# of Portions" value="{{ dish.portions }}" required>
     </div>
     <button type="submit" class="btn btn-info">
