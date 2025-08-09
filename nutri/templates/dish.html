@@ -7,19 +7,16 @@
 {% block header %}
 <div class="container mt-5">
     <div class="row">
-        <div class="col-md-4 bg-light border">
+        <div class="col-md-6 bg-light border">
             <div class="jumbotron">
                 <h1 class="display-4">{{dish.title}}</h1>
                 <p class="lead">{{dish.description}}</p>
                 <p class="lead">
                     {% include 'forms/dish-delete.html' %}
                 </p>
-                <p class="lead">
-                    {% include 'forms/dish-update.html' %}
-                </p>
             </div>
         </div>
-        <div class="col-md-4 bg-light border">
+        <!-- <div class="col-md-4 bg-light border">
             <h2>Total Nutrition:</h2>
             <ul class="list-group list-group-flush">
             {% set nutrition_keys = ['calories', 'fat', 'sodium', 'carbohydrates', 'fiber', 'protein'] %}
@@ -27,13 +24,14 @@
                 <li class="list-group-item">{{key}}: {{dish.nutrition()[key] | round | int }}</li>
             {% endfor %}
             </ul>
-        </div>
+        </div> -->
         <div class="col-md-4 bg-light border">
-            <h2>Nutrition per Serving ({{dish.servings}}):</h2>
+            {% include 'forms/dish-update.html' %}
+            <h2>Nutrition per Portion:</h2>
             <ul class="list-group list-group-flush">
             {% set nutrition_keys = ['calories', 'fat', 'sodium', 'carbohydrates', 'fiber', 'protein'] %}
             {% for key in nutrition_keys %}
-                {% set per_serving = dish.nutrition()[key] / dish.servings %}
+                {% set per_serving = dish.nutrition()[key] / dish.portions %}
                 <li class="list-group-item">{{key}}: {{per_serving | round | int}}</li>
             {% endfor %}
             </ul>

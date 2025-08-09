@@ -29,7 +29,7 @@ def update_dish(id):
     dish = db.session.get(Dish, id)
     if not dish:
         return make_response("Dish not found", 404)
-    dish.servings = request.form.get("servings")
+    dish.portions = request.form.get("portions")
     db.session.commit()
     return redirect(url_for("dish", id=dish.id))
 
