@@ -14,30 +14,21 @@
     <div class="row">
         <div class="col-md-6 bg-light border">
             <div class="jumbotron">
-                <h1 class="display-4">{{dish.title}}</h1>
+                <h2 class="display-4">{{dish.title}}</h2>
                 <p class="lead">{{dish.description}}</p>
                 <p class="lead">
                     {% include 'forms/dish-delete.html' %}
                 </p>
             </div>
         </div>
-        <!-- <div class="col-md-4 bg-light border">
-            <h2>Total Nutrition:</h2>
-            <ul class="list-group list-group-flush">
-            {% set nutrition_keys = ['calories', 'fat', 'sodium', 'carbohydrates', 'fiber', 'protein'] %}
-            {% for key in nutrition_keys %}
-                <li class="list-group-item">{{key}}: {{dish.nutrition()[key] | round | int }}</li>
-            {% endfor %}
-            </ul>
-        </div> -->
-        <div class="col-md-4 bg-light border">
+        <div class="col-md-3 bg-light border">
             {% include 'forms/dish-update.html' %}
             <h3>Nutrition per Portion:</h3>
             <ul class="list-group list-group-flush">
             {% set nutrition_keys = ['calories', 'fat', 'sodium', 'carbohydrates', 'fiber', 'protein'] %}
-            {% for key in nutrition_keys %}
+            {% for key in dish.static_nutrition_keys() %}
                 {% set per_serving = dish.nutrition()[key] / dish.portions %}
-                <li class="list-group-item">{{key}}: {{per_serving | round | int}}</li>
+                <li class="list-group-item">{{dish.static_nutrition_label(key)}}: {{per_serving | round | int}}</li>
             {% endfor %}
             </ul>
         </div>

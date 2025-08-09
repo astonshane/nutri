@@ -4,17 +4,13 @@
         <th>Name</th>
         <th>Serving Description</th>
         <th># of Servings</th>
-        <th>Calories (kcal)</th>
-        <th>Fat (g)</th>
-        <th>Sodium (mg)</th>
-        <th>Carbohydrates (g)</th>
-        <th>Fiber (g)</th>
-        <th>Protein (g)</th>
+        <{% for key in dish.static_nutrition_keys() %}
+            <th>{{dish.static_nutrition_label(key)}}</th>
+        {% endfor %}
         <th></th>
         </tr>
     </thead>
     <tbody>
-        {% set nutrition_keys = ['calories', 'fat', 'sodium', 'carbohydrates', 'fiber', 'protein'] %}
         {% for ingredient in dish.ingredients %}
         <tr>
             <td>
@@ -24,26 +20,17 @@
             </td>
             <td>{{ingredient.serving().description}}</td>
             <td>{{ingredient.quantity}}</td>
-            {% for key in nutrition_keys %}
-                <td>{{ingredient.nutrition(True)[key] | round | int }}</td>
-            {% endfor %}
-            <td>{% include 'forms/ingredient-delete.html' %}</td>
-        </tr>
-        <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            {% for key in nutrition_keys %}
+            {% for key in dish.static_nutrition_keys() %}
                 <td>{{ingredient.nutrition()[key] | round | int }}</td>
             {% endfor %}
-            <td></td>
+            <td>{% include 'forms/ingredient-delete.html' %}</td>
         </tr>
         {% endfor %}
         <tr>
             <td>Total</td>
             <td></td>
             <td></td>
-            {% for key in nutrition_keys %}
+            {% for key in dish.static_nutrition_keys() %}
                 <td>{{dish.nutrition()[key] | round | int }}</td>
             {% endfor %}
             <td></td>

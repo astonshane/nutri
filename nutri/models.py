@@ -1,6 +1,24 @@
 from . import db, fs
+from .helpers import static_nutrition_info
 
-class Dish(db.Model):
+class BaseModel(db.Model):
+    __abstract__ = True
+
+    def static_nutrition_info(self):
+        return static_nutrition_info
+    
+    def static_nutrition_keys(self):
+        return list(static_nutrition_info.keys())
+    
+    def static_nutrition_label(self, key, withUnit=True):
+        if key not in static_nutrition_info:
+            return key
+        label = static_nutrition_info[key]['label']
+        if withUnit:
+            label += f" ({static_nutrition_info[key]['unit']})"
+        return label
+
+class Dish(BaseModel):
     __tablename__ = "dishes"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -30,7 +48,7 @@ class Dish(db.Model):
                 total_nutrition[key] += ing_nutrition[key]
         return total_nutrition
     
-class Ingredient(db.Model):
+class Ingredient(BaseModel):
     __tablename__ = "ingredients"
 
     id = db.Column(db.Integer, primary_key=True)
