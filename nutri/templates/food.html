@@ -13,14 +13,9 @@ Serving Size Options:
         <tr>
             <th>Id</th>
             <th>Description</th>
-            <th>Calories</th>
-            <th>Carbohydrate</th>
-            <th>Protein</th>
-            <th>Fat</th>
-            <th>Cholesterol</th>
-            <th>Sodium</th>
-            <th>Fiber</th>
-            <th>Sugar</th>
+            {% for key in food.static_nutrition_info().keys() %}
+            <th>{{ food.static_nutrition_label(key) }}</th>
+            {% endfor %}
             <th></th>
         </tr>
     </thead>
@@ -29,14 +24,9 @@ Serving Size Options:
         <tr>
             <td>{{ serving.id }}</td>
             <td>{{ serving.description }}</td>
-            <td>{{ serving.calories }}</td>
-            <td>{{ serving.carbohydrate }}</td>
-            <td>{{ serving.protein }}</td>
-            <td>{{ serving.fat }}</td>
-            <td>{{ serving.cholesterol }}</td>
-            <td>{{ serving.sodium }}</td>
-            <td>{{ serving.fiber }}</td>
-            <td>{{ serving.sugar }}</td>
+            {% for key in food.static_nutrition_info().keys() %}
+            <td>{{ serving.nutrition_info[key] }}</td>
+            {% endfor %}
             <td>
                 {% include 'forms/add-serving.html' %}
             </td>

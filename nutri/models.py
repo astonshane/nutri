@@ -1,24 +1,7 @@
 from . import db, fs
-from .helpers import static_nutrition_info
+from .helpers import BaseModel, static_nutrition_info
 
-class BaseModel(db.Model):
-    __abstract__ = True
-
-    def static_nutrition_info(self):
-        return static_nutrition_info
-    
-    def static_nutrition_keys(self):
-        return list(static_nutrition_info.keys())
-    
-    def static_nutrition_label(self, key, withUnit=True):
-        if key not in static_nutrition_info:
-            return key
-        label = static_nutrition_info[key]['label']
-        if withUnit:
-            label += f" ({static_nutrition_info[key]['unit']})"
-        return label
-
-class Dish(BaseModel):
+class Dish(BaseModel, db.Model):
     __tablename__ = "dishes"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -35,20 +18,16 @@ class Dish(BaseModel):
     
     def nutrition(self):
         total_nutrition = {
-            'calories': 0,
-            'fat': 0,
-            'sodium': 0,
-            'carbohydrates': 0,
-            'fiber': 0,
-            'protein': 0
         }
+        for key in static_nutrition_info.keys():
+            total_nutrition[key] = 0
         for ingredient in self.ingredients:
             ing_nutrition = ingredient.nutrition()
             for key in total_nutrition:
                 total_nutrition[key] += ing_nutrition[key]
         return total_nutrition
     
-class Ingredient(BaseModel):
+class Ingredient(BaseModel, db.Model):
     __tablename__ = "ingredients"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -89,14 +68,9 @@ class Ingredient(BaseModel):
 
         s = self.serving()
         mult = 1 if per_serving else self.quantity
-        n = {
-            'calories': s.calories * mult,
-            'fat': s.fat * mult,
-            'sodium': s.sodium * mult,
-            'carbohydrates': s.carbohydrate * mult,
-            'fiber': s.fiber * mult,
-            'protein': s.protein * mult
-        }
+        n = {}
+        for key in static_nutrition_info.keys():
+            n[key] = s.nutrition_info[key] * mult
 
         if per_serving:
             self._nutrition_per_serving = n

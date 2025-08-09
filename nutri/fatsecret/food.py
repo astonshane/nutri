@@ -1,6 +1,7 @@
 from .serving import Serving
+from ..helpers import BaseModel
 
-class Food:
+class Food(BaseModel):
     def __init__(self, body):
         self.id = body.get('food_id')
         self.name = body.get('food_name')
