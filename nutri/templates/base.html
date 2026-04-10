@@ -10,11 +10,35 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
   <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
   <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
   <script>
+    var macroChart = null;
+
+    function getMacroData() {
+      return [
+        parseFloat($('.per-portion-val[data-key="fat"]').text()),
+        parseFloat($('.per-portion-val[data-key="carbohydrate"]').text()),
+        parseFloat($('.per-portion-val[data-key="protein"]').text()),
+      ];
+    }
+
     $(function() {
       $('table.sortable:not(.sortable-paged)').DataTable({ paging: false, searching: false, info: false });
       var q = new URLSearchParams(window.location.search).get('q') || '';
       $('table.sortable-paged').DataTable({ search: { search: q } });
+
+      // Macro pie chart
+      var chartCanvas = document.getElementById('macro-chart');
+      if (chartCanvas) {
+        macroChart = new Chart(chartCanvas, {
+          type: 'pie',
+          data: {
+            labels: ['Fat', 'Carbs', 'Protein'],
+            datasets: [{ data: getMacroData(), backgroundColor: ['#f0ad4e', '#5bc0de', '#5cb85c'] }]
+          },
+          options: { plugins: { legend: { position: 'bottom' } } }
+        });
+      }
     });
 
     // Click-to-edit ingredient quantity
@@ -69,6 +93,12 @@
           $('.per-portion-val').each(function() {
             $(this).text(Math.round((totals[$(this).data('key')] || 0) / portions));
           });
+
+          // Update pie chart
+          if (macroChart) {
+            macroChart.data.datasets[0].data = getMacroData();
+            macroChart.update();
+          }
         })
         .fail(function() {
           $input.val($display.text().trim()).hide();

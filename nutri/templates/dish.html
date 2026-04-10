@@ -62,6 +62,9 @@
                 <strong>Nutrition</strong>
                 <span class="text-muted" style="font-weight: normal; font-size: 12px">per portion &middot; {{dish.portions}} total</span>
             </div>
+            <div style="padding: 12px">
+                <canvas id="macro-chart"></canvas>
+            </div>
             <table class="table" style="margin-bottom: 0">
                 {% for key in dish.static_nutrition_keys() %}
                 <tr {% if key == 'calories' %}style="font-weight: bold"{% endif %}>
