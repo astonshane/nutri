@@ -8,10 +8,13 @@ migrate = Migrate()
 fs = Fatsecret()
 
 
-def create_app():
+def create_app(test_config=None):
     """Construct the core application."""
     app = Flask(__name__, instance_relative_config=False)
     app.config.from_object("config.Config")
+
+    if test_config is not None:
+        app.config.update(test_config)
 
     # Initialize Database Plugin
     db.init_app(app)

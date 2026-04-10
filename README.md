@@ -20,6 +20,14 @@ FatSecret API credentials can be obtained by registering an application at [plat
 flask --app main run --debug
 ```
 
+## Tests
+
+```bash
+python -m pytest tests/ -v
+```
+
+No `.env` credentials are needed — tests use an in-memory SQLite database and mock FatSecret API calls.
+
 ## Database migrations
 
 ```bash
