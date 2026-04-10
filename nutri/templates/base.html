@@ -16,6 +16,65 @@
       var q = new URLSearchParams(window.location.search).get('q') || '';
       $('table.sortable-paged').DataTable({ search: { search: q } });
     });
+
+    // Click-to-edit ingredient quantity
+    $(document).on('click', '.qty-display', function() {
+      var $cell = $(this).closest('.qty-cell');
+      $(this).hide();
+      $cell.find('.qty-input').show().focus().select();
+    });
+
+    $(document).on('keydown blur', '.qty-input', function(e) {
+      if (e.type === 'keydown' && e.key !== 'Enter' && e.key !== 'Escape') return;
+      var $input = $(this);
+      var $cell = $input.closest('.qty-cell');
+      var $display = $cell.find('.qty-display');
+      if (e.key === 'Escape') {
+        $input.val($display.text().trim()).hide();
+        $display.show();
+        return;
+      }
+      var id = $cell.data('ingredient-id');
+      var qty = parseFloat($input.val());
+      $.post('/dishes/ingredients/' + id + '/update', { quantity: qty })
+        .done(function() {
+          $display.text(qty).show();
+          $input.hide();
+
+          // Update this row's nutrition cells
+          var $row = $cell.closest('tr');
+          $row.find('td[data-key]').each(function() {
+            $(this).text(Math.round(parseFloat($(this).data('per-unit')) * qty));
+          });
+          $row.data('quantity', qty);
+
+          // Recalculate totals from all rows
+          var $table = $row.closest('table');
+          var totals = {};
+          $table.find('tbody tr[data-quantity]').each(function() {
+            var rowQty = parseFloat($(this).data('quantity'));
+            $(this).find('td[data-key]').each(function() {
+              var key = $(this).data('key');
+              totals[key] = (totals[key] || 0) + parseFloat($(this).data('per-unit')) * rowQty;
+            });
+          });
+
+          // Update totals row
+          $table.find('tfoot td[data-key]').each(function() {
+            $(this).find('strong').text(Math.round(totals[$(this).data('key')] || 0));
+          });
+
+          // Update per-portion panel
+          var portions = $table.data('portions');
+          $('.per-portion-val').each(function() {
+            $(this).text(Math.round((totals[$(this).data('key')] || 0) / portions));
+          });
+        })
+        .fail(function() {
+          $input.val($display.text().trim()).hide();
+          $display.show();
+        });
+    });
   </script>
 </head>
 <body>

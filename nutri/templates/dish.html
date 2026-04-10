@@ -67,7 +67,7 @@
                 <tr {% if key == 'calories' %}style="font-weight: bold"{% endif %}>
                     <td>{{dish.static_nutrition_label(key, withUnit=False)}}</td>
                     <td class="text-right">
-                        {{per_portion[key] | round | int}}
+                        <span class="per-portion-val" data-key="{{ key }}">{{per_portion[key] | round | int}}</span>
                         <small class="text-muted">{{dish.static_nutrition_info()[key]['unit']}}</small>
                     </td>
                 </tr>

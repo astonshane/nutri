@@ -86,6 +86,21 @@ def insert_ingredient(id, food_id, serving_id):
 
     return redirect(url_for("dish", id=dish.id))
 
+@app.route("/dishes/ingredients/<int:id>/update", methods=["POST"])
+def update_ingredient(id):
+    ingredient = db.session.get(Ingredient, id)
+    if not ingredient:
+        return make_response("Ingredient not found", 404)
+    try:
+        quantity = float(request.form.get("quantity", 0))
+    except ValueError:
+        return make_response("Invalid quantity", 400)
+    if quantity <= 0:
+        return make_response("Quantity must be positive", 400)
+    ingredient.quantity = quantity
+    db.session.commit()
+    return ("", 204)
+
 @app.route("/dishes/ingredients/<int:id>/delete", methods=["POST"])
 def delete_ingredient(id):
     ingredient = db.session.get(Ingredient, id)
