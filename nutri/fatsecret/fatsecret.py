@@ -33,7 +33,7 @@ class Fatsecret:
             'page_number': page_number
         }
         results_json = self.request(path, params)
-        results = [Food(item) for item in results_json['foods']['food']]
+        results = [Food(item) for item in results_json.get('foods', {}).get('food', [])]
         return results
     
     def food(self, food_id):
@@ -43,5 +43,6 @@ class Fatsecret:
             'format': 'json'
         }
         results_json = self.request(path, params)
-        # print(results_json)
+        if 'food' not in results_json:
+            return None
         return Food(results_json['food'])

@@ -1,6 +1,7 @@
 from flask import current_app as app
 from flask import make_response, redirect, render_template, request, url_for
 
+from ..helpers import static_nutrition_info
 from ..models import Dish, Ingredient, db, fs
 
 def list_dishes():
@@ -29,7 +30,7 @@ def update_dish(id):
     dish = db.session.get(Dish, id)
     if not dish:
         return make_response("Dish not found", 404)
-    dish.portions = request.form.get("portions")
+    dish.portions = int(request.form.get("portions"))
     db.session.commit()
     return redirect(url_for("dish", id=dish.id))
 
@@ -39,7 +40,7 @@ def dishes():
         dish = Dish(
             title=request.form["title"],
             description=request.form["description"],
-            servings = int(request.form.get("servings", 1))  # Default to 1 serving if not provided
+            portions = int(request.form.get("servings", 1))  # Default to 1 serving if not provided
         )
         db.session.add(dish)
         db.session.commit()
@@ -51,21 +52,32 @@ def dishes():
 @app.route("/dishes/<int:id>/ingredients/<int:food_id>/<int:serving_id>/insert", methods=["POST"])
 def insert_ingredient(id, food_id, serving_id):
     dish = db.session.get(Dish, id)
+    if not dish:
+        return make_response("Dish not found", 404)
+
+    food = fs.food(food_id)
+    serving = food.serving(serving_id)
 
     ingredient = Ingredient(
         food_id=food_id,
         serving_id=serving_id,
         quantity=float(request.form['quantity']),
-        dish_id=dish.id
+        dish_id=dish.id,
+        food_name=food.name,
+        food_url=food.url,
+        serving_description=serving.description,
+        **{key: serving.nutrition_info[key] for key in static_nutrition_info.keys()}
     )
     db.session.add(ingredient)
     db.session.commit()
-    
+
     return redirect(url_for("dish", id=dish.id))
 
 @app.route("/dishes/ingredients/<int:id>/delete", methods=["POST"])
 def delete_ingredient(id):
     ingredient = db.session.get(Ingredient, id)
+    if not ingredient:
+        return make_response("Ingredient not found", 404)
     dish = ingredient.dish
     db.session.delete(ingredient)
     db.session.commit()

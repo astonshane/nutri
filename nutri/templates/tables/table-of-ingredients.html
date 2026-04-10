@@ -4,7 +4,7 @@
         <th>Name</th>
         <th>Serving Description</th>
         <th># of Servings</th>
-        <{% for key in dish.static_nutrition_keys() %}
+        {% for key in dish.static_nutrition_keys() %}
             <th>{{dish.static_nutrition_label(key)}}</th>
         {% endfor %}
         <th></th>
@@ -14,11 +14,11 @@
         {% for ingredient in dish.ingredients %}
         <tr>
             <td>
-                <a href="{{ingredient.food().url}}">
-                    {{ingredient.food().name}}
+                <a href="{{ingredient.food_url}}">
+                    {{ingredient.food_name}}
                 </a>
             </td>
-            <td>{{ingredient.serving().description}}</td>
+            <td>{{ingredient.serving_description}}</td>
             <td>{{ingredient.quantity}}</td>
             {% for key in dish.static_nutrition_keys() %}
                 <td>{{ingredient.nutrition()[key] | round | int }}</td>

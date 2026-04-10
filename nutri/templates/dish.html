@@ -25,7 +25,6 @@
             {% include 'forms/dish-update.html' %}
             <h3>Nutrition per Portion:</h3>
             <ul class="list-group list-group-flush">
-            {% set nutrition_keys = ['calories', 'fat', 'sodium', 'carbohydrates', 'fiber', 'protein'] %}
             {% for key in dish.static_nutrition_keys() %}
                 {% set per_serving = dish.nutrition()[key] / dish.portions %}
                 <li class="list-group-item">{{dish.static_nutrition_label(key)}}: {{per_serving | round | int}}</li>
