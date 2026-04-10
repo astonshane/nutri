@@ -3,9 +3,37 @@
 {% block title %}Search{% endblock %}
 
 {% block header %}
-<h1>Search Results for: {{ search_expression }}</h1>
+{% if search_expression %}
+Search Results for: {{ search_expression }}
+{% else %}
+Search
+{% endif %}
 {% endblock %}
 
 {% block content %}
-{% include 'tables/table-of-foods.html' %}
+{% if search_expression is defined and search_expression %}
+    {% include 'tables/table-of-foods.html' %}
+
+    <div class="text-center">
+        {% if page > 0 %}
+        <form action="{{ url_for('search_ingredients', id=dish.id) }}" method="post" style="display:inline">
+            <input type="hidden" name="search_expression" value="{{ search_expression }}">
+            <input type="hidden" name="page" value="{{ page - 1 }}">
+            <button type="submit" class="btn btn-default">
+                <span class="glyphicon glyphicon-chevron-left"></span> Prev
+            </button>
+        </form>
+        {% endif %}
+        <span class="btn btn-default disabled">Page {{ page + 1 }}</span>
+        {% if has_next %}
+        <form action="{{ url_for('search_ingredients', id=dish.id) }}" method="post" style="display:inline">
+            <input type="hidden" name="search_expression" value="{{ search_expression }}">
+            <input type="hidden" name="page" value="{{ page + 1 }}">
+            <button type="submit" class="btn btn-default">
+                Next <span class="glyphicon glyphicon-chevron-right"></span>
+            </button>
+        </form>
+        {% endif %}
+    </div>
+{% endif %}
 {% endblock %}

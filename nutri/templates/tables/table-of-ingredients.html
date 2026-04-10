@@ -1,4 +1,5 @@
-<table class="table table-striped table-hover">
+{% set totals = dish.nutrition() %}
+<table class="table table-striped table-hover" style="margin-bottom: 0">
     <thead>
         <tr>
         <th>Name</th>
@@ -12,6 +13,7 @@
     </thead>
     <tbody>
         {% for ingredient in dish.ingredients %}
+        {% set ing_nutrition = ingredient.nutrition() %}
         <tr>
             <td>
                 <a href="{{ingredient.food_url}}">
@@ -21,17 +23,17 @@
             <td>{{ingredient.serving_description}}</td>
             <td>{{ingredient.quantity}}</td>
             {% for key in dish.static_nutrition_keys() %}
-                <td>{{ingredient.nutrition()[key] | round | int }}</td>
+                <td>{{ing_nutrition[key] | round | int }}</td>
             {% endfor %}
             <td>{% include 'forms/ingredient-delete.html' %}</td>
         </tr>
         {% endfor %}
         <tr>
-            <td>Total</td>
+            <td><strong>Total</strong></td>
             <td></td>
             <td></td>
             {% for key in dish.static_nutrition_keys() %}
-                <td>{{dish.nutrition()[key] | round | int }}</td>
+                <td><strong>{{totals[key] | round | int }}</strong></td>
             {% endfor %}
             <td></td>
         </tr>

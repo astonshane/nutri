@@ -1,47 +1,75 @@
 {% extends 'base.html' %}
 
-{% block title %}
-{{dish.title}}
-{% endblock %}
+{% block title %}{{dish.title}}{% endblock %}
 
-{% block header %}
-
-{% endblock %}
+{% block header %}{% endblock %}
 
 {% block content %}
+{% set per_portion = dish.nutrition_per_portion() %}
 
-<div class="container mt-5">
+<div class="page-header" style="margin-top: 10px">
     <div class="row">
-        <div class="col-md-6 bg-light border">
-            <div class="jumbotron">
-                <h2 class="display-4">{{dish.title}}</h2>
-                <p class="lead">{{dish.description}}</p>
-                <p class="lead">
-                    {% include 'forms/dish-delete.html' %}
-                </p>
-            </div>
+        <div class="col-sm-8">
+            <h1>
+                {{dish.title}}
+                <small>{{dish.description}}</small>
+            </h1>
         </div>
-        <div class="col-md-3 bg-light border">
+        <div class="col-sm-4 text-right" style="padding-top: 18px">
             {% include 'forms/dish-update.html' %}
-            <h3>Nutrition per Portion:</h3>
-            <ul class="list-group list-group-flush">
-            {% for key in dish.static_nutrition_keys() %}
-                {% set per_serving = dish.nutrition()[key] / dish.portions %}
-                <li class="list-group-item">{{dish.static_nutrition_label(key)}}: {{per_serving | round | int}}</li>
-            {% endfor %}
-            </ul>
+            {% include 'forms/dish-delete.html' %}
         </div>
     </div>
 </div>
 
-{% include 'tables/table-of-ingredients.html' %}
+<div class="row">
 
-<form class="navbar-form navbar-left" action="{{ url_for('search_ingredients', id=dish.id)}}" method="post">
-        <div class="form-group">
-            <input class="form-control" type="text" id="search_expression" name="search_expression" placeholder="add ingredient" required>
+    <div class="col-md-9">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <strong>Ingredients</strong>
+                    </div>
+                    <div class="col-xs-6 text-right">
+                        <form action="{{ url_for('search_ingredients', id=dish.id)}}" method="post" class="form-inline">
+                            <div class="input-group input-group-sm">
+                                <input class="form-control" type="text" name="search_expression" placeholder="Add ingredient..." required>
+                                <span class="input-group-btn">
+                                    <button type="submit" class="btn btn-primary btn-sm">
+                                        <span class="glyphicon glyphicon-plus"></span>
+                                    </button>
+                                </span>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body" style="padding: 0">
+                {% include 'tables/table-of-ingredients.html' %}
+            </div>
         </div>
-        <button type="submit" class="btn btn-default">search</button>
-    </form>
+    </div>
 
+    <div class="col-md-3">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <strong>Nutrition</strong>
+                <span class="text-muted" style="font-weight: normal; font-size: 12px">per portion &middot; {{dish.portions}} total</span>
+            </div>
+            <table class="table" style="margin-bottom: 0">
+                {% for key in dish.static_nutrition_keys() %}
+                <tr {% if key == 'calories' %}style="font-weight: bold"{% endif %}>
+                    <td>{{dish.static_nutrition_label(key, withUnit=False)}}</td>
+                    <td class="text-right">
+                        {{per_portion[key] | round | int}}
+                        <small class="text-muted">{{dish.static_nutrition_info()[key]['unit']}}</small>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+
+</div>
 {% endblock %}
-

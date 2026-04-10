@@ -11,21 +11,23 @@ class Dish(BaseModel, db.Model):
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, server_default=db.func.now(), server_onupdate=db.func.now())
 
-    ingredients = db.relationship('Ingredient', back_populates='dish')
+    ingredients = db.relationship('Ingredient', back_populates='dish', cascade='all, delete-orphan')
 
     def __repr__(self):
         return f"<Dish id={self.id}, title={self.title}>"
     
     def nutrition(self):
-        total_nutrition = {
-        }
-        for key in static_nutrition_info.keys():
-            total_nutrition[key] = 0
+        total = {key: 0 for key in static_nutrition_info.keys()}
         for ingredient in self.ingredients:
             ing_nutrition = ingredient.nutrition()
-            for key in total_nutrition:
-                total_nutrition[key] += ing_nutrition[key]
-        return total_nutrition
+            for key in total:
+                total[key] += ing_nutrition[key]
+        return total
+
+    def nutrition_per_portion(self):
+        total = self.nutrition()
+        portions = self.portions or 1
+        return {key: val / portions for key, val in total.items()}
     
 class Ingredient(BaseModel, db.Model):
     __tablename__ = "ingredients"

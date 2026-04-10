@@ -1,17 +1,25 @@
 <table class="table table-striped">
     <thead>
         <tr>
-        <th>title</th>
-        <th>description</th>
+        <th>Title</th>
+        <th>Description</th>
+        <th>Cal/portion</th>
+        <th>Carbs/portion</th>
+        <th>Protein/portion</th>
+        <th></th>
         </tr>
     </thead>
     <tbody>
         {% for dish in dishes %}
+        {% set per_portion = dish.nutrition_per_portion() %}
         <tr>
             <td>
                 <a href="{{ url_for('dish', id=dish.id) }}">{{ dish.title }}</a>
             </td>
             <td>{{ dish.description }}</td>
+            <td>{{ per_portion['calories'] | round | int }} kcal</td>
+            <td>{{ per_portion['carbohydrate'] | round | int }} g</td>
+            <td>{{ per_portion['protein'] | round | int }} g</td>
             <td>
                 {% include 'forms/dish-delete.html' %}
             </td>

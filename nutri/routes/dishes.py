@@ -1,5 +1,5 @@
 from flask import current_app as app
-from flask import make_response, redirect, render_template, request, url_for
+from flask import flash, make_response, redirect, render_template, request, url_for
 
 from ..helpers import static_nutrition_info
 from ..models import Dish, Ingredient, db, fs
@@ -20,9 +20,10 @@ def delete_dish(id):
     dish = db.session.get(Dish, id)
     if not dish:
         return make_response("Dish not found", 404)
+    title = dish.title
     db.session.delete(dish)
     db.session.commit()
-    # set flash message?
+    flash(f'"{title}" deleted.')
     return redirect(url_for("dishes"))
 
 @app.route("/dish/<int:id>/update", methods=["POST"])
@@ -30,8 +31,11 @@ def update_dish(id):
     dish = db.session.get(Dish, id)
     if not dish:
         return make_response("Dish not found", 404)
-    dish.portions = int(request.form.get("portions"))
+    dish.title = request.form.get("title", dish.title).strip() or dish.title
+    dish.description = request.form.get("description", dish.description)
+    dish.portions = int(request.form.get("portions", dish.portions))
     db.session.commit()
+    flash("Dish updated.")
     return redirect(url_for("dish", id=dish.id))
 
 @app.route("/dishes", methods=["GET", "POST"])
@@ -78,11 +82,12 @@ def delete_ingredient(id):
     ingredient = db.session.get(Ingredient, id)
     if not ingredient:
         return make_response("Ingredient not found", 404)
-    dish = ingredient.dish
+    dish_id = ingredient.dish_id
+    food_name = ingredient.food_name
     db.session.delete(ingredient)
     db.session.commit()
-    
-    return redirect(url_for("dish", id=dish.id))
+    flash(f'"{food_name}" removed.')
+    return redirect(url_for("dish", id=dish_id))
 
 
 @app.route("/dishes/<int:id>/ingredients", methods=["GET", "POST"])
@@ -93,8 +98,16 @@ def search_ingredients(id):
 
     if request.method == "POST":
         search_expression = request.form.get("search_expression", "")
-        results = fs.search(search_expression, max_results=50, page_number=0)
-        return render_template('search.html', search_expression=search_expression, foods=results, dish=dish)
+        page = int(request.form.get("page", 0))
+        results = fs.search(search_expression, max_results=50, page_number=page)
+        return render_template(
+            'search.html',
+            search_expression=search_expression,
+            foods=results,
+            dish=dish,
+            page=page,
+            has_next=len(results) == 50,
+        )
 
     return render_template('search.html', dish=dish)
 
