@@ -10,10 +10,28 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env  # then fill in FatSecret API credentials
+flask db upgrade      # apply all migrations
 
 # Run
 flask --app main run --debug
 ```
+
+## Database migrations
+
+Migrations are managed with Flask-Migrate (Alembic). The `migrations/` folder is committed to git.
+
+```bash
+# After changing a model:
+flask db migrate -m "describe the change"  # generate migration file
+flask db upgrade                           # apply to the database
+
+# Other useful commands:
+flask db downgrade   # roll back one migration
+flask db history     # list all migrations
+flask db current     # show which migration the DB is at
+```
+
+Never modify the DB schema manually (ALTER TABLE, etc.) — always go through migrations so the history stays consistent.
 
 ## Architecture
 

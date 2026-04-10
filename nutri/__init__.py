@@ -1,8 +1,10 @@
 from flask import Flask
+from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from .fatsecret.fatsecret import Fatsecret
 
 db = SQLAlchemy()
+migrate = Migrate()
 fs = Fatsecret()
 
 
@@ -13,6 +15,7 @@ def create_app():
 
     # Initialize Database Plugin
     db.init_app(app)
+    migrate.init_app(app, db)
     fs.setToken(app.config['FATSECRET_CLIENT_ID'], app.config['FATSECRET_CLIENT_SECRET'])
 
     with app.app_context():
