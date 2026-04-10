@@ -33,7 +33,11 @@ def update_dish(id):
         return make_response("Dish not found", 404)
     dish.title = request.form.get("title", dish.title).strip() or dish.title
     dish.description = request.form.get("description", dish.description)
-    dish.url = request.form.get("url", dish.url).strip() or None
+    url = request.form.get("url", "").strip()
+    if url and not (url.startswith("http://") or url.startswith("https://")):
+        flash("Recipe URL must start with http:// or https://")
+        return redirect(url_for("dish", id=dish.id))
+    dish.url = url or None
     dish.portions = int(request.form.get("portions", dish.portions))
     db.session.commit()
     flash("Dish updated.")
@@ -42,10 +46,14 @@ def update_dish(id):
 @app.route("/dishes", methods=["GET", "POST"])
 def dishes():
     if request.method == "POST":
+        url = request.form.get("url", "").strip()
+        if url and not (url.startswith("http://") or url.startswith("https://")):
+            url = None
         dish = Dish(
             title=request.form["title"],
             description=request.form["description"],
-            portions = int(request.form.get("servings", 1))  # Default to 1 serving if not provided
+            url=url or None,
+            portions=int(request.form.get("servings", 1)),
         )
         db.session.add(dish)
         db.session.commit()
@@ -99,7 +107,7 @@ def search_ingredients(id):
 
     if request.method == "POST":
         search_expression = request.form.get("search_expression", "")
-        page = int(request.form.get("page", 0))
+        page = max(0, min(int(request.form.get("page", 0)), 100))
         results = fs.search(search_expression, max_results=50, page_number=page)
         return render_template(
             'search.html',
