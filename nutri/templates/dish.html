@@ -14,6 +14,11 @@
                 {{dish.title}}
                 <small>{{dish.description}}</small>
             </h1>
+            {% if dish.url %}
+            <a href="{{ dish.url }}" target="_blank" rel="noopener">
+                <span class="glyphicon glyphicon-link"></span> Recipe source
+            </a>
+            {% endif %}
         </div>
         <div class="col-sm-4 text-right" style="padding-top: 18px">
             {% include 'forms/dish-update.html' %}

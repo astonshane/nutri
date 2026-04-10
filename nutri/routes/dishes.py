@@ -33,6 +33,7 @@ def update_dish(id):
         return make_response("Dish not found", 404)
     dish.title = request.form.get("title", dish.title).strip() or dish.title
     dish.description = request.form.get("description", dish.description)
+    dish.url = request.form.get("url", dish.url).strip() or None
     dish.portions = int(request.form.get("portions", dish.portions))
     db.session.commit()
     flash("Dish updated.")
