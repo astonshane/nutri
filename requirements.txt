@@ -1,5 +1,9 @@
+alembic==1.16.1
 blinker==1.9.0
+Flask-Migrate==4.1.0
+Flask-SQLAlchemy==3.1.1
 pytest==9.0.3
+SQLAlchemy==2.0.41
 certifi==2025.4.26
 charset-normalizer==3.4.2
 click==8.2.1
