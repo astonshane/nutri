@@ -1,37 +1,42 @@
 {% extends 'base.html' %}
 
-{% block title %}Home{% endblock %}
+{% block title %}{{ food.name }}{% endblock %}
 
 {% block header %}
-<h1>{{ food.name }} ({{ food.brand }})</h1>
+<div class="page-title">
+  <h1>{{ food.name }}</h1>
+  {% if food.brand %}<p class="text-muted">{{ food.brand }}</p>{% endif %}
+</div>
 {% endblock %}
 
 {% block content %}
-Serving Size Options:
-<table class="table table-striped">
-    <thead>
+<div class="card">
+  <div class="card-header">
+    <i class="bi bi-list-ul me-1" style="color:var(--nutri-primary)"></i>Serving Size Options
+  </div>
+  <div class="card-body p-0">
+    <table class="table table-hover table-sm mb-0">
+      <thead class="table-light">
         <tr>
-            <th>Id</th>
-            <th>Description</th>
-            {% for key in food.static_nutrition_info().keys() %}
-            <th>{{ food.static_nutrition_label(key) }}</th>
-            {% endfor %}
-            <th></th>
+          <th>Description</th>
+          {% for key in food.static_nutrition_info().keys() %}
+          <th>{{ food.static_nutrition_label(key) }}</th>
+          {% endfor %}
+          <th></th>
         </tr>
-    </thead>
-    <tbody>
+      </thead>
+      <tbody>
         {% for serving in food.servings %}
         <tr>
-            <td>{{ serving.id }}</td>
-            <td>{{ serving.description }}</td>
-            {% for key in food.static_nutrition_info().keys() %}
-            <td>{{ serving.nutrition_info[key] }}</td>
-            {% endfor %}
-            <td>
-                {% include 'forms/add-serving.html' %}
-            </td>
+          <td>{{ serving.description }}</td>
+          {% for key in food.static_nutrition_info().keys() %}
+          <td>{{ serving.nutrition_info[key] }}</td>
+          {% endfor %}
+          <td>{% include 'forms/add-serving.html' %}</td>
         </tr>
         {% endfor %}
-    </tbody>
-</table>
+      </tbody>
+    </table>
+  </div>
+</div>
 {% endblock %}

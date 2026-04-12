@@ -1,25 +1,35 @@
 {% extends 'base.html' %}
 
 {% block title %}Home{% endblock %}
-{% block header %}Nutri{% endblock %}
+
+{% block header %}
+<div class="page-title">
+  <h1>Welcome to Nutri</h1>
+  <p class="text-muted">Build recipes from nutritional food data.</p>
+</div>
+{% endblock %}
 
 {% block content %}
-<p class="lead text-muted" style="margin-bottom: 30px">Build recipes from nutritional food data.</p>
-
-<div class="row">
-    <div class="col-sm-4">
-        <a href="{{ url_for('dishes') }}" class="thumbnail" style="padding: 24px; text-decoration: none; color: inherit">
-            <span class="glyphicon glyphicon-cutlery" style="font-size: 32px; color: #5cb85c"></span>
-            <h3 style="margin-top: 12px">Dishes</h3>
-            <p class="text-muted">Create and manage recipes. Search for ingredients and track nutrition per portion.</p>
-        </a>
-    </div>
-    <div class="col-sm-4">
-        <div class="thumbnail" style="padding: 24px; opacity: 0.5; cursor: default">
-            <span class="glyphicon glyphicon-calendar" style="font-size: 32px; color: #5bc0de"></span>
-            <h3 style="margin-top: 12px">Meals <small class="text-muted">coming soon</small></h3>
-            <p class="text-muted">Plan meals across the week and see combined nutrition totals.</p>
+<div class="row g-3">
+  <div class="col-sm-4">
+    <a href="{{ url_for('dishes') }}" class="text-decoration-none">
+      <div class="card feature-card p-4">
+        <div class="feature-icon mb-3" style="background:#e4f5ec">
+          <i class="bi bi-egg-fried" style="color:var(--nutri-primary)"></i>
         </div>
+        <h5 class="fw-600 mb-1">Dishes</h5>
+        <p class="text-muted mb-0" style="font-size:.9rem">Create and manage recipes. Search for ingredients and track nutrition per portion.</p>
+      </div>
+    </a>
+  </div>
+  <div class="col-sm-4">
+    <div class="card feature-card p-4" style="opacity:.45; pointer-events:none">
+      <div class="feature-icon mb-3" style="background:#eef2ff">
+        <i class="bi bi-calendar3" style="color:#6366f1"></i>
+      </div>
+      <h5 class="fw-600 mb-1">Meals <span class="badge bg-secondary ms-1" style="font-size:.65rem; vertical-align:middle">soon</span></h5>
+      <p class="text-muted mb-0" style="font-size:.9rem">Plan meals across the week and see combined nutrition totals.</p>
     </div>
+  </div>
 </div>
 {% endblock %}

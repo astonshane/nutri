@@ -7,77 +7,67 @@
 {% block content %}
 {% set per_portion = dish.nutrition_per_portion() %}
 
-<div class="page-header" style="margin-top: 10px">
-    <div class="row">
-        <div class="col-sm-8">
-            <h1>
-                {{dish.title}}
-                <small>{{dish.description}}</small>
-            </h1>
-            {% if dish.url %}
-            <a href="{{ dish.url }}" target="_blank" rel="noopener">
-                <span class="glyphicon glyphicon-link"></span> Recipe source
-            </a>
-            {% endif %}
-        </div>
-        <div class="col-sm-4 text-right" style="padding-top: 18px">
-            {% include 'forms/dish-update.html' %}
-            {% include 'forms/dish-delete.html' %}
-        </div>
-    </div>
+<div class="page-title d-flex align-items-start justify-content-between flex-wrap gap-2 mb-4">
+  <div>
+    <h1 class="mb-1">{{dish.title}}</h1>
+    {% if dish.description %}
+      <p class="text-muted mb-1">{{dish.description}}</p>
+    {% endif %}
+    {% if dish.url %}
+      <a href="{{ dish.url }}" target="_blank" rel="noopener" class="text-decoration-none" style="font-size:.9rem; color:var(--nutri-primary)">
+        <i class="bi bi-box-arrow-up-right me-1"></i>Recipe source
+      </a>
+    {% endif %}
+  </div>
+  <div class="d-flex gap-2 align-items-start" style="padding-top:4px">
+    {% include 'forms/dish-update.html' %}
+    {% include 'forms/dish-delete.html' %}
+  </div>
 </div>
 
-<div class="row">
+<div class="row g-4">
 
-    <div class="col-md-9">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <div class="row">
-                    <div class="col-xs-6">
-                        <strong>Ingredients</strong>
-                    </div>
-                    <div class="col-xs-6 text-right">
-                        <form action="{{ url_for('search_ingredients', id=dish.id)}}" method="post" class="form-inline">
-                            <div class="input-group input-group-sm">
-                                <input class="form-control" type="text" name="search_expression" placeholder="Add ingredient..." required>
-                                <span class="input-group-btn">
-                                    <button type="submit" class="btn btn-primary btn-sm">
-                                        <span class="glyphicon glyphicon-plus"></span>
-                                    </button>
-                                </span>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            <div class="panel-body" style="padding: 0">
-                {% include 'tables/table-of-ingredients.html' %}
-            </div>
-        </div>
+  <div class="col-md-3">
+    <div class="card">
+      <div class="card-header d-flex align-items-baseline gap-2">
+        <span><i class="bi bi-bar-chart-fill me-1" style="color:var(--nutri-primary)"></i>Nutrition</span>
+        <span class="text-muted fw-normal" style="font-size:.8rem">per portion &middot; {{dish.portions}} total</span>
+      </div>
+      <div class="p-3">
+        <canvas id="macro-chart"></canvas>
+      </div>
+      <table class="table table-sm mb-0" style="border-top: 1px solid #e2e8e4">
+        {% for key in dish.static_nutrition_keys() %}
+        <tr class="nutrition-row-{{ key }} {% if key == 'calories' %}fw-bold{% endif %}">
+          <td>{{dish.static_nutrition_label(key, withUnit=False)}}</td>
+          <td class="text-end">
+            <span class="per-portion-val" data-key="{{ key }}">{{per_portion[key] | round | int}}</span>
+            <small class="text-muted ms-1">{{dish.static_nutrition_info()[key]['unit']}}</small>
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
     </div>
+  </div>
 
-    <div class="col-md-3">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <strong>Nutrition</strong>
-                <span class="text-muted" style="font-weight: normal; font-size: 12px">per portion &middot; {{dish.portions}} total</span>
-            </div>
-            <div style="padding: 12px">
-                <canvas id="macro-chart"></canvas>
-            </div>
-            <table class="table" style="margin-bottom: 0">
-                {% for key in dish.static_nutrition_keys() %}
-                <tr {% if key == 'calories' %}style="font-weight: bold"{% endif %}>
-                    <td>{{dish.static_nutrition_label(key, withUnit=False)}}</td>
-                    <td class="text-right">
-                        <span class="per-portion-val" data-key="{{ key }}">{{per_portion[key] | round | int}}</span>
-                        <small class="text-muted">{{dish.static_nutrition_info()[key]['unit']}}</small>
-                    </td>
-                </tr>
-                {% endfor %}
-            </table>
-        </div>
+  <div class="col-md-9">
+    <div class="card">
+      <div class="card-header d-flex align-items-center justify-content-between">
+        <span><i class="bi bi-list-ul me-1" style="color:var(--nutri-primary)"></i>Ingredients</span>
+        <form action="{{ url_for('search_ingredients', id=dish.id)}}" method="post" class="d-flex">
+          <div class="input-group input-group-sm">
+            <input class="form-control" type="text" name="search_expression" placeholder="Add ingredient..." required>
+            <button type="submit" class="btn btn-sm" style="background:var(--nutri-primary); color:#fff">
+              <i class="bi bi-plus-lg"></i>
+            </button>
+          </div>
+        </form>
+      </div>
+      <div class="card-body p-0" style="overflow-x: auto">
+        {% include 'tables/table-of-ingredients.html' %}
+      </div>
     </div>
+  </div>
 
 </div>
 {% endblock %}

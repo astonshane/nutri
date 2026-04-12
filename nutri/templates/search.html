@@ -2,41 +2,50 @@
 
 {% block title %}Search{% endblock %}
 
-{% block header %}Search{% endblock %}
+{% block header %}
+<div class="page-title">
+  <h1>Add Ingredient</h1>
+  <p class="text-muted">to <strong>{{ dish.title }}</strong></p>
+</div>
+{% endblock %}
 
 {% block content %}
-<form action="{{ url_for('search_ingredients', id=dish.id) }}" method="post" class="form-inline" style="margin-bottom: 20px">
-    <div class="input-group">
-        <input class="form-control" type="text" name="search_expression" value="{{ search_expression or '' }}" placeholder="Search ingredients..." required autofocus>
-        <span class="input-group-btn">
-            <button type="submit" class="btn btn-primary">Search</button>
-        </span>
-    </div>
+<form action="{{ url_for('search_ingredients', id=dish.id) }}" method="post" class="d-flex mb-4" style="max-width:480px">
+  <div class="input-group">
+    <input class="form-control" type="text" name="search_expression" value="{{ search_expression or '' }}" placeholder="Search ingredients..." required autofocus>
+    <button type="submit" class="btn" style="background:var(--nutri-primary); color:#fff">
+      <i class="bi bi-search me-1"></i>Search
+    </button>
+  </div>
 </form>
 
 {% if search_expression is defined and search_expression %}
-    {% include 'tables/table-of-foods.html' %}
-
-    <div class="text-center">
-        {% if page > 0 %}
-        <form action="{{ url_for('search_ingredients', id=dish.id) }}" method="post" style="display:inline">
-            <input type="hidden" name="search_expression" value="{{ search_expression }}">
-            <input type="hidden" name="page" value="{{ page - 1 }}">
-            <button type="submit" class="btn btn-default">
-                <span class="glyphicon glyphicon-chevron-left"></span> Prev
-            </button>
-        </form>
-        {% endif %}
-        <span class="btn btn-default disabled">Page {{ page + 1 }}</span>
-        {% if has_next %}
-        <form action="{{ url_for('search_ingredients', id=dish.id) }}" method="post" style="display:inline">
-            <input type="hidden" name="search_expression" value="{{ search_expression }}">
-            <input type="hidden" name="page" value="{{ page + 1 }}">
-            <button type="submit" class="btn btn-default">
-                Next <span class="glyphicon glyphicon-chevron-right"></span>
-            </button>
-        </form>
-        {% endif %}
+  <div class="card">
+    <div class="card-body p-0">
+      {% include 'tables/table-of-foods.html' %}
     </div>
+  </div>
+
+  <div class="d-flex align-items-center gap-2 mt-3">
+    {% if page > 0 %}
+    <form action="{{ url_for('search_ingredients', id=dish.id) }}" method="post">
+      <input type="hidden" name="search_expression" value="{{ search_expression }}">
+      <input type="hidden" name="page" value="{{ page - 1 }}">
+      <button type="submit" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-chevron-left"></i> Prev
+      </button>
+    </form>
+    {% endif %}
+    <span class="text-muted" style="font-size:.9rem">Page {{ page + 1 }}</span>
+    {% if has_next %}
+    <form action="{{ url_for('search_ingredients', id=dish.id) }}" method="post">
+      <input type="hidden" name="search_expression" value="{{ search_expression }}">
+      <input type="hidden" name="page" value="{{ page + 1 }}">
+      <button type="submit" class="btn btn-outline-secondary btn-sm">
+        Next <i class="bi bi-chevron-right"></i>
+      </button>
+    </form>
+    {% endif %}
+  </div>
 {% endif %}
 {% endblock %}

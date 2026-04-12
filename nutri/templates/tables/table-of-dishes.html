@@ -1,29 +1,33 @@
-<table class="table table-striped sortable sortable-paged">
-    <thead>
-        <tr>
-        <th>Title</th>
-        <th>Description</th>
-        <th>Cal/portion</th>
-        <th>Carbs/portion</th>
-        <th>Protein/portion</th>
-        <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for dish in dishes %}
-        {% set per_portion = dish.nutrition_per_portion() %}
-        <tr>
-            <td>
-                <a href="{{ url_for('dish', id=dish.id) }}">{{ dish.title }}</a>
-            </td>
-            <td>{{ dish.description }}</td>
-            <td data-order="{{ per_portion['calories'] | round | int }}">{{ per_portion['calories'] | round | int }} kcal</td>
-            <td data-order="{{ per_portion['carbohydrate'] | round | int }}">{{ per_portion['carbohydrate'] | round | int }} g</td>
-            <td data-order="{{ per_portion['protein'] | round | int }}">{{ per_portion['protein'] | round | int }} g</td>
-            <td>
-                {% include 'forms/dish-delete.html' %}
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
+<table class="table table-hover mb-0 sortable sortable-paged">
+  <thead class="table-light">
+    <tr>
+      <th>Title</th>
+      <th>Description</th>
+      <th>Calories</th>
+      <th>Carbs</th>
+      <th>Protein</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for dish in dishes %}
+    {% set per_portion = dish.nutrition_per_portion() %}
+    <tr>
+      <td class="fw-500">
+        <a href="{{ url_for('dish', id=dish.id) }}" class="text-decoration-none" style="color:var(--nutri-dark)">{{ dish.title }}</a>
+      </td>
+      <td class="text-muted" style="font-size:.9rem">{{ dish.description }}</td>
+      <td data-order="{{ per_portion['calories'] | round | int }}">
+        <span class="macro-badge badge-calories">{{ per_portion['calories'] | round | int }} kcal</span>
+      </td>
+      <td data-order="{{ per_portion['carbohydrate'] | round | int }}">
+        <span class="macro-badge badge-carbs">{{ per_portion['carbohydrate'] | round | int }} g</span>
+      </td>
+      <td data-order="{{ per_portion['protein'] | round | int }}">
+        <span class="macro-badge badge-protein">{{ per_portion['protein'] | round | int }} g</span>
+      </td>
+      <td>{% include 'forms/dish-delete.html' %}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
 </table>
