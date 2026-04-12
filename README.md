@@ -2,6 +2,20 @@
 
 Flask app for building dishes (recipes) from nutritional food data sourced via the FatSecret API.
 
+## Screenshots
+
+**Home**
+![Home page](docs/screenshots/home.png)
+
+**Dishes**
+![Dishes list](docs/screenshots/dishes.png)
+
+**Dish detail**
+![Dish detail with ingredients and nutrition](docs/screenshots/dish-detail.png)
+
+**Ingredient search**
+![Ingredient search](docs/screenshots/ingredient-search.png)
+
 ## Setup
 
 ```bash
