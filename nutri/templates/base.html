@@ -69,6 +69,124 @@
     .page-title .text-muted { font-size: .95rem; }
     .fw-500 { font-weight: 500 !important; }
     .fw-600 { font-weight: 600 !important; }
+
+    /* ===== Table redesign ===== */
+
+    /* Strip all borders — we'll add only what we want */
+    .table { border-collapse: collapse; }
+    .table > :not(caption) > * > * {
+      border-right: none !important;
+      border-left: none !important;
+      box-shadow: none !important;
+    }
+
+    /* Column headers */
+    .table > thead > tr > th,
+    .table > thead.table-light > tr > th {
+      background: #fff !important;
+      color: var(--nutri-primary);
+      font-size: .7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      border-top: none !important;
+      border-bottom: 2px solid var(--nutri-primary) !important;
+      padding: .7rem .85rem;
+      white-space: nowrap;
+    }
+
+    /* DataTables sort arrows: tint to match header */
+    table.dataTable thead th.sorting::before,
+    table.dataTable thead th.sorting::after,
+    table.dataTable thead th.sorting_asc::after,
+    table.dataTable thead th.sorting_desc::after { color: var(--nutri-light); }
+
+    /* Body rows */
+    .table > tbody > tr > td {
+      border-bottom: 1px solid #edf2ef !important;
+      vertical-align: middle;
+      padding: .65rem .85rem;
+      color: #2e3a35;
+    }
+    .table > tbody > tr:last-child > td { border-bottom: none !important; }
+
+    /* Hover */
+    .table-hover > tbody > tr:hover > td {
+      background-color: #f0f7f4 !important;
+    }
+
+    /* Footer / totals row */
+    .table > tfoot > tr > td {
+      background: #f5fbf8 !important;
+      border-top: 2px solid var(--nutri-light) !important;
+      border-bottom: none !important;
+      padding: .7rem .85rem;
+      color: var(--nutri-dark);
+    }
+
+    /* ===== DataTables controls ===== */
+    .dataTables_wrapper {
+      padding: .85rem 1rem;
+    }
+    .dataTables_wrapper .dataTables_filter,
+    .dataTables_wrapper .dataTables_length {
+      margin-bottom: .5rem;
+    }
+    .dataTables_wrapper .dataTables_filter label,
+    .dataTables_wrapper .dataTables_length label {
+      font-size: .82rem;
+      color: #6c7c74;
+      font-weight: 500;
+      gap: .4rem;
+      display: flex;
+      align-items: center;
+    }
+    .dataTables_wrapper .dataTables_filter input,
+    .dataTables_wrapper .dataTables_length select {
+      border: 1px solid #cdd9d4;
+      border-radius: 6px;
+      padding: .3rem .55rem;
+      font-size: .82rem;
+      color: #2e3a35;
+      background: #fff;
+      outline: none;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .dataTables_wrapper .dataTables_filter input:focus,
+    .dataTables_wrapper .dataTables_length select:focus {
+      border-color: var(--nutri-primary);
+      box-shadow: 0 0 0 3px rgba(45,106,79,.12);
+    }
+    .dataTables_wrapper .dataTables_info {
+      font-size: .78rem;
+      color: #9eb3a9;
+      padding-top: .6rem;
+    }
+
+    /* Pagination */
+    .dataTables_wrapper .pagination { gap: 3px; }
+    .dataTables_wrapper .pagination .page-link {
+      border-radius: 6px !important;
+      color: var(--nutri-primary);
+      border-color: #cdd9d4;
+      font-size: .82rem;
+      padding: .3rem .6rem;
+      transition: background .12s, border-color .12s;
+    }
+    .dataTables_wrapper .pagination .page-item.active .page-link {
+      background: var(--nutri-primary);
+      border-color: var(--nutri-primary);
+      color: #fff;
+    }
+    .dataTables_wrapper .pagination .page-link:hover {
+      background: #e4f0ea;
+      border-color: var(--nutri-primary);
+      color: var(--nutri-dark);
+    }
+    .dataTables_wrapper .pagination .page-item.disabled .page-link {
+      color: #bfcfc9;
+      border-color: #e5ecea;
+    }
   </style>
 
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>

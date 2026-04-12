@@ -27,25 +27,6 @@
 
 <div class="row g-4">
 
-  <div class="col-md-9">
-    <div class="card">
-      <div class="card-header d-flex align-items-center justify-content-between">
-        <span><i class="bi bi-list-ul me-1" style="color:var(--nutri-primary)"></i>Ingredients</span>
-        <form action="{{ url_for('search_ingredients', id=dish.id)}}" method="post" class="d-flex">
-          <div class="input-group input-group-sm">
-            <input class="form-control" type="text" name="search_expression" placeholder="Add ingredient..." required>
-            <button type="submit" class="btn btn-sm" style="background:var(--nutri-primary); color:#fff">
-              <i class="bi bi-plus-lg"></i>
-            </button>
-          </div>
-        </form>
-      </div>
-      <div class="card-body p-0">
-        {% include 'tables/table-of-ingredients.html' %}
-      </div>
-    </div>
-  </div>
-
   <div class="col-md-3">
     <div class="card">
       <div class="card-header d-flex align-items-baseline gap-2">
@@ -66,6 +47,25 @@
         </tr>
         {% endfor %}
       </table>
+    </div>
+  </div>
+
+  <div class="col-md-9">
+    <div class="card">
+      <div class="card-header d-flex align-items-center justify-content-between">
+        <span><i class="bi bi-list-ul me-1" style="color:var(--nutri-primary)"></i>Ingredients</span>
+        <form action="{{ url_for('search_ingredients', id=dish.id)}}" method="post" class="d-flex">
+          <div class="input-group input-group-sm">
+            <input class="form-control" type="text" name="search_expression" placeholder="Add ingredient..." required>
+            <button type="submit" class="btn btn-sm" style="background:var(--nutri-primary); color:#fff">
+              <i class="bi bi-plus-lg"></i>
+            </button>
+          </div>
+        </form>
+      </div>
+      <div class="card-body p-0" style="overflow-x: auto">
+        {% include 'tables/table-of-ingredients.html' %}
+      </div>
     </div>
   </div>
 

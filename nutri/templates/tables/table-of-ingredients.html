@@ -4,11 +4,11 @@
     <tr>
       <th>Name</th>
       <th>Serving</th>
-      <th># Servings</th>
+      <th style="width:1%; white-space:nowrap">Qty</th>
       {% for key in dish.static_nutrition_keys() %}
-        <th>{{dish.static_nutrition_label(key)}}</th>
+        <th style="width:1%; white-space:nowrap; text-align:right">{{dish.static_nutrition_label(key)}}</th>
       {% endfor %}
-      <th></th>
+      <th style="width:1%"></th>
     </tr>
   </thead>
   <tbody>
@@ -26,7 +26,7 @@
         <input class="qty-input form-control form-control-sm d-none" type="number" min="0.01" step="any" value="{{ ingredient.quantity }}">
       </td>
       {% for key in dish.static_nutrition_keys() %}
-        <td data-key="{{ key }}" data-per-unit="{{ (ing_nutrition[key] / ingredient.quantity) if ingredient.quantity else 0 }}">
+        <td data-key="{{ key }}" data-per-unit="{{ (ing_nutrition[key] / ingredient.quantity) if ingredient.quantity else 0 }}" style="text-align:right; white-space:nowrap">
           {{ing_nutrition[key] | round | int }}
         </td>
       {% endfor %}
@@ -40,7 +40,7 @@
       <td></td>
       <td></td>
       {% for key in dish.static_nutrition_keys() %}
-        <td data-key="{{ key }}"><strong>{{totals[key] | round | int }}</strong></td>
+        <td data-key="{{ key }}" style="text-align:right; white-space:nowrap"><strong>{{totals[key] | round | int }}</strong></td>
       {% endfor %}
       <td></td>
     </tr>

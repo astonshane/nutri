@@ -1,6 +1,6 @@
 static_nutrition_info = {
     'calories': {
-        'label': 'Calories',
+        'label': 'Cal',
         'unit': 'kcal'
     },
     'fat': {
@@ -12,7 +12,7 @@ static_nutrition_info = {
         'unit': 'mg'
     },
     'carbohydrate': {
-        'label': 'Carbohydrates',
+        'label': 'Carbs',
         'unit': 'g'
     },
     'fiber': {
