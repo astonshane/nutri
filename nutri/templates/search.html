@@ -2,15 +2,18 @@
 
 {% block title %}Search{% endblock %}
 
-{% block header %}
-{% if search_expression %}
-Search Results for: {{ search_expression }}
-{% else %}
-Search
-{% endif %}
-{% endblock %}
+{% block header %}Search{% endblock %}
 
 {% block content %}
+<form action="{{ url_for('search_ingredients', id=dish.id) }}" method="post" class="form-inline" style="margin-bottom: 20px">
+    <div class="input-group">
+        <input class="form-control" type="text" name="search_expression" value="{{ search_expression or '' }}" placeholder="Search ingredients..." required autofocus>
+        <span class="input-group-btn">
+            <button type="submit" class="btn btn-primary">Search</button>
+        </span>
+    </div>
+</form>
+
 {% if search_expression is defined and search_expression %}
     {% include 'tables/table-of-foods.html' %}
 

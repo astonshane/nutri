@@ -1,12 +1,25 @@
 {% extends 'base.html' %}
 
 {% block title %}Home{% endblock %}
-
-{% block header %}
-<h2>Existing Dishes</h2>
-{% include 'tables/table-of-dishes.html' %}
-{% endblock %}
+{% block header %}Nutri{% endblock %}
 
 {% block content %}
-{% endblock %}
+<p class="lead text-muted" style="margin-bottom: 30px">Build recipes from nutritional food data.</p>
 
+<div class="row">
+    <div class="col-sm-4">
+        <a href="{{ url_for('dishes') }}" class="thumbnail" style="padding: 24px; text-decoration: none; color: inherit">
+            <span class="glyphicon glyphicon-cutlery" style="font-size: 32px; color: #5cb85c"></span>
+            <h3 style="margin-top: 12px">Dishes</h3>
+            <p class="text-muted">Create and manage recipes. Search for ingredients and track nutrition per portion.</p>
+        </a>
+    </div>
+    <div class="col-sm-4">
+        <div class="thumbnail" style="padding: 24px; opacity: 0.5; cursor: default">
+            <span class="glyphicon glyphicon-calendar" style="font-size: 32px; color: #5bc0de"></span>
+            <h3 style="margin-top: 12px">Meals <small class="text-muted">coming soon</small></h3>
+            <p class="text-muted">Plan meals across the week and see combined nutrition totals.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

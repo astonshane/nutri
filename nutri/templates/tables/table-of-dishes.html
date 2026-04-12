@@ -17,9 +17,9 @@
                 <a href="{{ url_for('dish', id=dish.id) }}">{{ dish.title }}</a>
             </td>
             <td>{{ dish.description }}</td>
-            <td>{{ per_portion['calories'] | round | int }} kcal</td>
-            <td>{{ per_portion['carbohydrate'] | round | int }} g</td>
-            <td>{{ per_portion['protein'] | round | int }} g</td>
+            <td data-order="{{ per_portion['calories'] | round | int }}">{{ per_portion['calories'] | round | int }} kcal</td>
+            <td data-order="{{ per_portion['carbohydrate'] | round | int }}">{{ per_portion['carbohydrate'] | round | int }} g</td>
+            <td data-order="{{ per_portion['protein'] | round | int }}">{{ per_portion['protein'] | round | int }} g</td>
             <td>
                 {% include 'forms/dish-delete.html' %}
             </td>

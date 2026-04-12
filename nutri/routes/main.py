@@ -8,4 +8,4 @@ from .. import fs, db
 
 @app.route("/")
 def index():
-    return render_template('index.html', dishes=list_dishes())
+    return render_template('index.html')
