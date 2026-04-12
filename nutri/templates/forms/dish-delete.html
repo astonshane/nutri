@@ -1,5 +1,5 @@
-<form action="{{ url_for('delete_dish', id=dish.id)}}" method="post">
-    <button type="submit" class="btn btn-danger">
-        <span class="glyphicon glyphicon-trash"></span>
-    </button>
+<form action="{{ url_for('delete_dish', id=dish.id)}}" method="post" class="d-inline">
+  <button type="submit" class="btn btn-outline-danger btn-sm action-btn" title="Delete dish">
+    <i class="bi bi-trash3"></i>
+  </button>
 </form>
