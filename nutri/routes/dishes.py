@@ -1,5 +1,9 @@
+import logging
+
 from flask import current_app as app
 from flask import flash, make_response, redirect, render_template, request, url_for
+
+logger = logging.getLogger(__name__)
 
 from ..helpers import static_nutrition_info
 from ..models import CustomFood, Dish, Ingredient, db, fs
@@ -135,6 +139,8 @@ def insert_custom_ingredient(dish_id, cf_id):
         return make_response("Custom food not found", 404)
     try:
         quantity = float(request.form.get('quantity', 1.0))
+        if quantity <= 0:
+            quantity = 1.0
     except (ValueError, TypeError):
         quantity = 1.0
     ingredient = Ingredient(
@@ -163,9 +169,9 @@ def search_ingredients(id):
         page = max(0, min(int(request.form.get("page", 0)), 100))
 
         # Query custom foods first so they appear even if FatSecret fails
-        custom_results = CustomFood.query.filter(
-            CustomFood.name.ilike(f'%{search_expression}%')
-        ).all()
+        custom_results = db.session.execute(
+            db.select(CustomFood).where(CustomFood.name.ilike(f'%{search_expression}%'))
+        ).scalars().all()
         custom_food_results = [
             {
                 'is_custom': True,
@@ -179,7 +185,8 @@ def search_ingredients(id):
 
         try:
             fs_results = fs.search(search_expression, max_results=50, page_number=page)
-        except Exception:
+        except Exception as exc:
+            logger.warning("FatSecret search failed: %s", exc)
             fs_results = []
 
         # Combine: custom foods first, then FatSecret results
