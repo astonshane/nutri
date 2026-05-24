@@ -350,3 +350,55 @@ class TestCustomFoodDelete:
 
     def test_delete_nonexistent_returns_404(self, client):
         assert client.post('/custom-foods/9999/delete').status_code == 404
+
+    def test_confirmed_delete_preserves_linked_ingredient(self, client, custom_food_in_use, app):
+        """Deleting a used CustomFood nulls custom_food_id but keeps the Ingredient row."""
+        cf_id, _, ing_id = custom_food_in_use
+        resp = client.post(f'/custom-foods/{cf_id}/delete', data={'confirm': '1'})
+        assert resp.status_code == 302
+        with app.app_context():
+            ing = _db.session.get(Ingredient, ing_id)
+            assert ing is not None, 'Ingredient should be preserved after CustomFood delete'
+            assert ing.custom_food_id is None
+
+
+class TestCustomFoodDuplicateName:
+    def test_create_duplicate_name_redirects_with_error(self, client, custom_food, app):
+        """Creating a CustomFood with a duplicate name flashes an error and does not create a second row."""
+        resp = client.post('/custom-foods/', data={
+            'name': 'Test Oat', 'serving_description': '100g', **_NUTRITION,
+        }, follow_redirects=True)
+        assert resp.status_code == 200
+        assert b'already exists' in resp.data
+        with app.app_context():
+            count = _db.session.execute(
+                _db.select(_db.func.count()).select_from(CustomFood)
+            ).scalar()
+            assert count == 1
+
+    def test_update_duplicate_name_redirects_with_error(self, client, custom_food, app):
+        """Renaming a CustomFood to a name already taken flashes an error and does not save."""
+        with app.app_context():
+            other = CustomFood(
+                name='Other Food',
+                serving_description='50g',
+                calories=50.0,
+                fat=1.0,
+                sodium=10.0,
+                carbohydrate=5.0,
+                fiber=0.5,
+                protein=2.0,
+            )
+            _db.session.add(other)
+            _db.session.commit()
+            other_id = other.id
+
+        resp = client.post(f'/custom-foods/{other_id}/update', data={
+            'name': 'Test Oat', 'serving_description': '50g',
+            **{k: '50' for k in _NUTRITION},
+        }, follow_redirects=True)
+        assert resp.status_code == 200
+        assert b'already exists' in resp.data
+        with app.app_context():
+            cf = _db.session.get(CustomFood, other_id)
+            assert cf.name == 'Other Food'

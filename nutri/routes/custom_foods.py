@@ -1,4 +1,5 @@
-from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask import Blueprint, flash, make_response, redirect, render_template, request, url_for
+from sqlalchemy.exc import IntegrityError
 
 from ..helpers import static_nutrition_info
 from ..models import CustomFood, Ingredient, db
@@ -60,9 +61,14 @@ def create():
 
     food = CustomFood(name=name, serving_description=serving_description, **nutrition)
     db.session.add(food)
-    db.session.commit()
-    flash(f'"{food.name}" created.', 'success')
-    return redirect(url_for('custom_foods.index'))
+    try:
+        db.session.commit()
+        flash(f'"{food.name}" created.', 'success')
+        return redirect(url_for('custom_foods.index'))
+    except IntegrityError:
+        db.session.rollback()
+        flash('A custom food with that name already exists.', 'danger')
+        return redirect(url_for('custom_foods.new'))
 
 
 @bp.route('/<int:id>/edit', methods=['GET'])
@@ -70,7 +76,6 @@ def edit(id):
     """Show edit form."""
     food = db.session.get(CustomFood, id)
     if not food:
-        from flask import make_response
         return make_response('Custom food not found', 404)
     return render_template('custom_foods/form.html', custom_food=food)
 
@@ -80,7 +85,6 @@ def update(id):
     """Save edits to an existing custom food."""
     food = db.session.get(CustomFood, id)
     if not food:
-        from flask import make_response
         return make_response('Custom food not found', 404)
 
     name = request.form.get('name', '').strip()
@@ -102,9 +106,14 @@ def update(id):
     food.serving_description = serving_description
     for field, value in nutrition.items():
         setattr(food, field, value)
-    db.session.commit()
-    flash(f'"{food.name}" updated.', 'success')
-    return redirect(url_for('custom_foods.index'))
+    try:
+        db.session.commit()
+        flash(f'"{food.name}" updated.', 'success')
+        return redirect(url_for('custom_foods.index'))
+    except IntegrityError:
+        db.session.rollback()
+        flash('A custom food with that name already exists.', 'danger')
+        return redirect(url_for('custom_foods.edit', id=id))
 
 
 @bp.route('/<int:id>/delete', methods=['POST'])
@@ -112,7 +121,6 @@ def delete(id):
     """Delete a custom food, with a warning if it is used by any ingredients."""
     food = db.session.get(CustomFood, id)
     if not food:
-        from flask import make_response
         return make_response('Custom food not found', 404)
 
     usage_count = db.session.execute(
@@ -125,15 +133,18 @@ def delete(id):
         if request.form.get('confirm') != '1':
             flash(
                 f'"{food.name}" is used by {usage_count} dish ingredient(s). '
-                'Submit again with confirmation to delete it and remove those ingredients.',
+                'Submit again with confirmation to delete it. '
+                'Existing dish ingredients using it will be preserved.',
                 'warning',
             )
             return redirect(url_for('custom_foods.index'))
-        # Confirmed: delete (cascade will handle linked ingredients)
         name = food.name
         db.session.delete(food)
         db.session.commit()
-        flash(f'"{name}" and its {usage_count} ingredient reference(s) deleted.', 'success')
+        flash(
+            f'"{name}" deleted. Existing dish ingredients using it have been preserved.',
+            'success',
+        )
         return redirect(url_for('custom_foods.index'))
 
     # Not used anywhere — delete immediately
