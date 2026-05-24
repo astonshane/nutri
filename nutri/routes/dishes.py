@@ -57,7 +57,7 @@ def dishes():
             title=request.form["title"],
             description=request.form["description"],
             url=url or None,
-            portions=int(request.form.get("servings", 1)),
+            portions=int(request.form.get("servings") or 1),
         )
         db.session.add(dish)
         db.session.commit()
