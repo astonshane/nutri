@@ -300,6 +300,9 @@
           <a class="nav-link {% if request.endpoint in ('dishes', 'dish') %}active fw-semibold{% endif %}" href="{{ url_for('dishes')}}">Dishes</a>
         </li>
         <li class="nav-item">
+          <a class="nav-link {% if request.endpoint and request.endpoint.startswith('custom_foods.') %}active fw-semibold{% endif %}" href="{{ url_for('custom_foods.index') }}">Custom Foods</a>
+        </li>
+        <li class="nav-item">
           <a class="nav-link disabled text-muted">Meals <span class="badge bg-secondary ms-1" style="font-size:.65rem">soon</span></a>
         </li>
       </ul>
@@ -317,9 +320,21 @@
 
 <div class="container py-4">
   {% block header %}{% endblock %}
-  {% for message in get_flashed_messages() %}
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-      <i class="bi bi-check-circle-fill me-2"></i>{{ message }}
+  {% for category, message in get_flashed_messages(with_categories=true) %}
+    {% set alert_class = {
+      'success': 'alert-success',
+      'warning': 'alert-warning',
+      'danger':  'alert-danger',
+      'error':   'alert-danger'
+    }.get(category, 'alert-info') %}
+    {% set icon = {
+      'success': 'bi-check-circle-fill',
+      'warning': 'bi-exclamation-triangle-fill',
+      'danger':  'bi-x-circle-fill',
+      'error':   'bi-x-circle-fill'
+    }.get(category, 'bi-info-circle-fill') %}
+    <div class="alert {{ alert_class }} alert-dismissible fade show" role="alert">
+      <i class="bi {{ icon }} me-2"></i>{{ message }}
       <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
   {% endfor %}

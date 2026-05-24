@@ -3,50 +3,71 @@
 {% block title %}{{ custom_food.name }}{% endblock %}
 
 {% block header %}
-<div class="page-title">
-  <h1>{{ custom_food.name }}</h1>
-  <p class="text-muted">Custom Food &mdash; add to <strong>{{ dish.title }}</strong></p>
+<div class="page-title mb-4">
+  <div class="d-flex align-items-center gap-2 mb-1">
+    <a href="{{ url_for('search_ingredients', id=dish.id) }}" class="text-decoration-none"
+       style="color:var(--nutri-primary); font-size:.9rem">
+      <i class="bi bi-chevron-left"></i> Back to search
+    </a>
+  </div>
+  <h1 class="mb-1">{{ custom_food.name }}</h1>
+  <p class="text-muted mb-0">
+    <span class="badge me-1" style="background:#e4f5ec; color:var(--nutri-dark); font-weight:600; font-size:.75rem">Custom</span>
+    Add to <strong>{{ dish.title }}</strong>
+  </p>
 </div>
 {% endblock %}
 
 {% block content %}
-<div class="card mb-4">
-  <div class="card-header">
-    <i class="bi bi-list-ul me-1" style="color:var(--nutri-primary)"></i>Nutrition per {{ custom_food.serving_description }}
-  </div>
-  <div class="card-body p-0">
-    <table class="table table-sm mb-0">
-      <thead class="table-light">
-        <tr>
-          {% for key in custom_food.static_nutrition_info().keys() %}
-          <th>{{ custom_food.static_nutrition_label(key) }}</th>
-          {% endfor %}
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          {% for key in custom_food.static_nutrition_info().keys() %}
-          <td>{{ custom_food|attr(key) }}</td>
-          {% endfor %}
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</div>
+<div class="row g-4">
 
-<div class="card">
-  <div class="card-header">
-    <i class="bi bi-plus-circle me-1" style="color:var(--nutri-primary)"></i>Add to dish
+  <div class="col-md-5">
+    <div class="card">
+      <div class="card-header">
+        <i class="bi bi-bar-chart-fill me-1" style="color:var(--nutri-primary)"></i>
+        Nutrition per {{ custom_food.serving_description }}
+      </div>
+      <table class="table table-sm mb-0">
+        {% for key in custom_food.static_nutrition_keys() %}
+        <tr class="nutrition-row-{{ key }} {% if key == 'calories' %}fw-bold{% endif %}">
+          <td>{{ custom_food.static_nutrition_label(key, withUnit=False) }}</td>
+          <td class="text-end">
+            {{ custom_food|attr(key) }}
+            <small class="text-muted ms-1">{{ custom_food.static_nutrition_info()[key]['unit'] }}</small>
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
   </div>
-  <div class="card-body">
-    <form action="{{ url_for('insert_custom_ingredient', dish_id=dish.id, cf_id=custom_food.id) }}" method="post" class="d-flex gap-2 align-items-center">
-      <label for="quantity" class="form-label mb-0">Quantity (servings):</label>
-      <input class="form-control form-control-sm" type="number" id="quantity" name="quantity"
-             min="0.01" step="any" value="1" required style="width:90px">
-      <button type="submit" class="btn btn-sm" style="background:var(--nutri-primary); color:#fff; white-space:nowrap">
-        <i class="bi bi-plus-lg"></i> Add
-      </button>
-    </form>
+
+  <div class="col-md-7">
+    <div class="card">
+      <div class="card-header">
+        <i class="bi bi-plus-circle me-1" style="color:var(--nutri-primary)"></i>
+        Add to <strong>{{ dish.title }}</strong>
+      </div>
+      <div class="card-body">
+        <p class="text-muted mb-3" style="font-size:.9rem">
+          How many servings of <strong>{{ custom_food.serving_description }}</strong>?
+        </p>
+        <form action="{{ url_for('insert_custom_ingredient', dish_id=dish.id, cf_id=custom_food.id) }}"
+              method="post" class="d-flex gap-2 align-items-center">
+          <input class="form-control form-control-sm"
+                 type="number" id="quantity" name="quantity"
+                 min="0.01" step="0.1" value="1" required
+                 style="width:100px">
+          <label for="quantity" class="form-label mb-0 text-muted" style="font-size:.9rem">
+            &times; {{ custom_food.serving_description }}
+          </label>
+          <button type="submit" class="btn btn-sm ms-auto"
+                  style="background:var(--nutri-primary); color:#fff; white-space:nowrap">
+            <i class="bi bi-plus-lg me-1"></i>Add to dish
+          </button>
+        </form>
+      </div>
+    </div>
   </div>
+
 </div>
 {% endblock %}
