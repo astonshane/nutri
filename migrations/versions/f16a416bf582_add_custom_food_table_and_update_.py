@@ -29,7 +29,6 @@ def upgrade():
         sa.Column('fiber', sa.Float(), nullable=False),
         sa.Column('protein', sa.Float(), nullable=False),
         sa.PrimaryKeyConstraint('id'),
-        if_not_exists=True,
     )
     with op.batch_alter_table('ingredients', schema=None) as batch_op:
         batch_op.add_column(sa.Column('custom_food_id', sa.Integer(), nullable=True))

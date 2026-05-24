@@ -6,7 +6,7 @@ class CustomFood(BaseModel, db.Model):
     __tablename__ = 'custom_food'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False)
+    name = db.Column(db.String, nullable=False, unique=True)
     serving_description = db.Column(db.String, nullable=False)
     calories = db.Column(db.Float, nullable=False)
     fat = db.Column(db.Float, nullable=False)
@@ -83,11 +83,15 @@ class Ingredient(BaseModel, db.Model):
         return f"<Ingredient id={self.id}, food_id={self.food_id}>"
 
     def food(self):
+        if self.food_id is None:
+            return None
         if self._food is None:
             self._food = fs.food(self.food_id)
         return self._food
 
     def serving(self):
+        if self.food_id is None:
+            return None
         if self._serving is None:
             self._serving = self.food().serving(self.serving_id)
         return self._serving
