@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>{% if custom_food %}Edit{% else %}New{% endif %} Custom Food</h1>
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% for category, message in messages %}
+    <div class="alert alert-{{ category }}">{{ message }}</div>
+  {% endfor %}
+{% endwith %}
+<form method="post"
+      action="{{ url_for('custom_foods.update', id=custom_food.id) if custom_food else url_for('custom_foods.create') }}">
+  <div class="mb-3">
+    <label for="name" class="form-label">Name</label>
+    <input type="text" class="form-control" id="name" name="name"
+           value="{{ custom_food.name if custom_food else '' }}" required>
+  </div>
+  <div class="mb-3">
+    <label for="serving_description" class="form-label">Serving Description</label>
+    <input type="text" class="form-control" id="serving_description" name="serving_description"
+           value="{{ custom_food.serving_description if custom_food else '' }}" required>
+  </div>
+  <div class="mb-3">
+    <label for="calories" class="form-label">Cal (kcal)</label>
+    <input type="number" step="any" class="form-control" id="calories" name="calories"
+           value="{{ custom_food.calories if custom_food else '' }}" required>
+  </div>
+  <div class="mb-3">
+    <label for="fat" class="form-label">Fat (g)</label>
+    <input type="number" step="any" class="form-control" id="fat" name="fat"
+           value="{{ custom_food.fat if custom_food else '' }}" required>
+  </div>
+  <div class="mb-3">
+    <label for="sodium" class="form-label">Sodium (mg)</label>
+    <input type="number" step="any" class="form-control" id="sodium" name="sodium"
+           value="{{ custom_food.sodium if custom_food else '' }}" required>
+  </div>
+  <div class="mb-3">
+    <label for="carbohydrate" class="form-label">Carbs (g)</label>
+    <input type="number" step="any" class="form-control" id="carbohydrate" name="carbohydrate"
+           value="{{ custom_food.carbohydrate if custom_food else '' }}" required>
+  </div>
+  <div class="mb-3">
+    <label for="fiber" class="form-label">Fiber (g)</label>
+    <input type="number" step="any" class="form-control" id="fiber" name="fiber"
+           value="{{ custom_food.fiber if custom_food else '' }}" required>
+  </div>
+  <div class="mb-3">
+    <label for="protein" class="form-label">Protein (g)</label>
+    <input type="number" step="any" class="form-control" id="protein" name="protein"
+           value="{{ custom_food.protein if custom_food else '' }}" required>
+  </div>
+  <button type="submit" class="btn btn-primary">Save</button>
+  <a href="{{ url_for('custom_foods.index') }}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}

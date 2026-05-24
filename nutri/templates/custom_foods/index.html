@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Custom Foods</h1>
+<a href="{{ url_for('custom_foods.new') }}" class="btn btn-primary mb-3">Add Custom Food</a>
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% for category, message in messages %}
+    <div class="alert alert-{{ category }}">{{ message }}</div>
+  {% endfor %}
+{% endwith %}
+<ul>
+  {% for food in foods %}
+  <li>
+    <strong>{{ food.name }}</strong> — {{ food.serving_description }}
+    <a href="{{ url_for('custom_foods.edit', id=food.id) }}">Edit</a>
+    <form method="post" action="{{ url_for('custom_foods.delete', id=food.id) }}" style="display:inline">
+      <button type="submit">Delete</button>
+    </form>
+  </li>
+  {% else %}
+  <li>No custom foods yet.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

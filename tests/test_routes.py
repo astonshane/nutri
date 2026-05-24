@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from nutri import db as _db
-from nutri.models import Dish, Ingredient
+from nutri.models import CustomFood, Dish, Ingredient
 
 
 class TestDishList:
@@ -185,3 +185,168 @@ class TestInsertIngredient:
                 data={"quantity": "1"},
             )
         assert resp.status_code == 404
+
+
+# ---------------------------------------------------------------------------
+# Custom Foods
+# ---------------------------------------------------------------------------
+
+_NUTRITION = {
+    'calories': '100',
+    'fat': '2.5',
+    'sodium': '50',
+    'carbohydrate': '10',
+    'fiber': '1',
+    'protein': '5',
+}
+
+
+@pytest.fixture
+def custom_food(app):
+    """Create a CustomFood and return its id."""
+    with app.app_context():
+        cf = CustomFood(
+            name='Test Oat',
+            serving_description='100g',
+            calories=100.0,
+            fat=2.5,
+            sodium=50.0,
+            carbohydrate=10.0,
+            fiber=1.0,
+            protein=5.0,
+        )
+        _db.session.add(cf)
+        _db.session.commit()
+        return cf.id
+
+
+@pytest.fixture
+def custom_food_in_use(app):
+    """Create a CustomFood referenced by an Ingredient; return (cf_id, dish_id, ing_id)."""
+    with app.app_context():
+        cf = CustomFood(
+            name='Used Food',
+            serving_description='1 cup',
+            calories=200.0,
+            fat=5.0,
+            sodium=100.0,
+            carbohydrate=20.0,
+            fiber=2.0,
+            protein=10.0,
+        )
+        _db.session.add(cf)
+        _db.session.flush()
+        d = Dish(title='Test Dish', portions=1)
+        _db.session.add(d)
+        _db.session.flush()
+        ing = Ingredient(
+            quantity=1.0,
+            dish_id=d.id,
+            custom_food_id=cf.id,
+            food_name='Used Food',
+            serving_description='1 cup',
+            calories=200.0,
+            fat=5.0,
+            sodium=100.0,
+            carbohydrate=20.0,
+            fiber=2.0,
+            protein=10.0,
+        )
+        _db.session.add(ing)
+        _db.session.commit()
+        return cf.id, d.id, ing.id
+
+
+class TestCustomFoodList:
+    def test_get_returns_200(self, client):
+        assert client.get('/custom-foods/').status_code == 200
+
+    def test_lists_existing_foods(self, client, custom_food, app):
+        resp = client.get('/custom-foods/')
+        assert resp.status_code == 200
+
+
+class TestCustomFoodCreate:
+    def test_get_new_form_returns_200(self, client):
+        assert client.get('/custom-foods/new').status_code == 200
+
+    def test_post_valid_creates_food_and_redirects(self, client, app):
+        resp = client.post('/custom-foods/', data={
+            'name': 'New Food', 'serving_description': '100g', **_NUTRITION,
+        })
+        assert resp.status_code == 302
+        with app.app_context():
+            cf = _db.session.execute(_db.select(CustomFood)).scalar_one()
+            assert cf.name == 'New Food'
+            assert cf.calories == 100.0
+
+    def test_post_missing_name_redirects_without_creating(self, client, app):
+        resp = client.post('/custom-foods/', data={
+            'name': '', 'serving_description': '100g', **_NUTRITION,
+        })
+        assert resp.status_code == 302
+        with app.app_context():
+            count = _db.session.execute(
+                _db.select(_db.func.count()).select_from(CustomFood)
+            ).scalar()
+            assert count == 0
+
+    def test_post_missing_nutrition_field_redirects_without_creating(self, client, app):
+        data = {'name': 'Food', 'serving_description': '100g', **_NUTRITION}
+        del data['calories']
+        resp = client.post('/custom-foods/', data=data)
+        assert resp.status_code == 302
+        with app.app_context():
+            count = _db.session.execute(
+                _db.select(_db.func.count()).select_from(CustomFood)
+            ).scalar()
+            assert count == 0
+
+
+class TestCustomFoodEdit:
+    def test_get_edit_form_returns_200(self, client, custom_food):
+        assert client.get(f'/custom-foods/{custom_food}/edit').status_code == 200
+
+    def test_get_nonexistent_returns_404(self, client):
+        assert client.get('/custom-foods/9999/edit').status_code == 404
+
+    def test_post_update_saves_changes(self, client, custom_food, app):
+        resp = client.post(f'/custom-foods/{custom_food}/update', data={
+            'name': 'Renamed Oat', 'serving_description': '50g',
+            **{k: '99' for k in _NUTRITION},
+        })
+        assert resp.status_code == 302
+        with app.app_context():
+            cf = _db.session.get(CustomFood, custom_food)
+            assert cf.name == 'Renamed Oat'
+            assert cf.calories == 99.0
+
+    def test_post_update_nonexistent_returns_404(self, client):
+        assert client.post('/custom-foods/9999/update', data={
+            'name': 'x', 'serving_description': 'y', **_NUTRITION,
+        }).status_code == 404
+
+
+class TestCustomFoodDelete:
+    def test_delete_unused_food_removes_it(self, client, custom_food, app):
+        resp = client.post(f'/custom-foods/{custom_food}/delete')
+        assert resp.status_code == 302
+        with app.app_context():
+            assert _db.session.get(CustomFood, custom_food) is None
+
+    def test_delete_used_food_without_confirm_does_not_delete(self, client, custom_food_in_use, app):
+        cf_id, _, _ = custom_food_in_use
+        resp = client.post(f'/custom-foods/{cf_id}/delete')
+        assert resp.status_code == 302
+        with app.app_context():
+            assert _db.session.get(CustomFood, cf_id) is not None
+
+    def test_delete_used_food_with_confirm_deletes_it(self, client, custom_food_in_use, app):
+        cf_id, _, _ = custom_food_in_use
+        resp = client.post(f'/custom-foods/{cf_id}/delete', data={'confirm': '1'})
+        assert resp.status_code == 302
+        with app.app_context():
+            assert _db.session.get(CustomFood, cf_id) is None
+
+    def test_delete_nonexistent_returns_404(self, client):
+        assert client.post('/custom-foods/9999/delete').status_code == 404
