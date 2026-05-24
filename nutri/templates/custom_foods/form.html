@@ -30,6 +30,7 @@
       <div class="card-body">
         <form method="post"
               action="{{ url_for('custom_foods.update', id=custom_food.id) if custom_food else url_for('custom_foods.create') }}">
+          {% if dish_id %}<input type="hidden" name="dish_id" value="{{ dish_id }}">{% endif %}
 
           <div class="mb-3">
             <label for="name" class="form-label fw-500">Name</label>

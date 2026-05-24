@@ -38,7 +38,8 @@ def index():
 @bp.route('/new', methods=['GET'])
 def new():
     """Show create form."""
-    return render_template('custom_foods/form.html', custom_food=None)
+    dish_id = request.args.get('dish_id', type=int)
+    return render_template('custom_foods/form.html', custom_food=None, dish_id=dish_id)
 
 
 @bp.route('/', methods=['POST'])
@@ -59,16 +60,20 @@ def create():
         flash(error, 'danger')
         return redirect(url_for('custom_foods.new'))
 
+    dish_id = request.form.get('dish_id', type=int)
+
     food = CustomFood(name=name, serving_description=serving_description, **nutrition)
     db.session.add(food)
     try:
         db.session.commit()
         flash(f'"{food.name}" created.', 'success')
+        if dish_id:
+            return redirect(url_for('custom_food_detail', dish_id=dish_id, cf_id=food.id))
         return redirect(url_for('custom_foods.index'))
     except IntegrityError:
         db.session.rollback()
         flash('A custom food with that name already exists.', 'danger')
-        return redirect(url_for('custom_foods.new'))
+        return redirect(url_for('custom_foods.new', dish_id=dish_id) if dish_id else url_for('custom_foods.new'))
 
 
 @bp.route('/<int:id>/edit', methods=['GET'])
