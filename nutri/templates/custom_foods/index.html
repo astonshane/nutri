@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}Custom Foods{% endblock %}
+
+{% block header %}
+<div class="page-title d-flex align-items-start justify-content-between flex-wrap gap-2 mb-4">
+  <div>
+    <h1 class="mb-1"><i class="bi bi-bookmark-star me-2" style="color:var(--nutri-light)"></i>Custom Foods</h1>
+    <p class="text-muted mb-0">Your personal ingredient library</p>
+  </div>
+  <a href="{{ url_for('custom_foods.new') }}" class="btn btn-sm"
+     style="background:var(--nutri-primary); color:#fff; white-space:nowrap; padding-top:4px">
+    <i class="bi bi-plus-lg me-1"></i>New Custom Food
+  </a>
+</div>
+{% endblock %}
+
+{% block content %}
+{% if foods %}
+<div class="card">
+  <div class="card-body p-0" style="overflow-x:auto">
+    <table class="table table-hover table-sm mb-0 sortable">
+      <thead class="table-light">
+        <tr>
+          <th>Name</th>
+          <th>Serving</th>
+          <th style="text-align:right; white-space:nowrap">Cal (kcal)</th>
+          <th style="text-align:right; white-space:nowrap">Protein (g)</th>
+          <th style="text-align:right; white-space:nowrap">Fat (g)</th>
+          <th style="width:1%"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for food in foods %}
+        <tr>
+          <td class="fw-500">{{ food.name }}</td>
+          <td class="text-muted" style="font-size:.85rem">{{ food.serving_description }}</td>
+          <td style="text-align:right; white-space:nowrap">{{ food.calories | int }}</td>
+          <td style="text-align:right; white-space:nowrap">{{ food.protein }}</td>
+          <td style="text-align:right; white-space:nowrap">{{ food.fat }}</td>
+          <td style="white-space:nowrap">
+            <div class="d-flex gap-1 justify-content-end">
+              <a href="{{ url_for('custom_foods.edit', id=food.id) }}"
+                 class="btn btn-outline-secondary btn-sm action-btn"
+                 title="Edit">
+                <i class="bi bi-pencil"></i>
+              </a>
+              <form method="post" action="{{ url_for('custom_foods.delete', id=food.id) }}"
+                    onsubmit="return confirm('Delete &quot;{{ food.name }}&quot;? This cannot be undone.')">
+                <button type="submit" class="btn btn-outline-danger btn-sm action-btn" title="Delete">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% else %}
+<div class="card">
+  <div class="card-body text-center py-5">
+    <div class="mb-3" style="font-size:2.5rem; color:#cdd9d4">
+      <i class="bi bi-bookmark-star"></i>
+    </div>
+    <h5 class="fw-600 mb-1" style="color:var(--nutri-dark)">No custom foods yet</h5>
+    <p class="text-muted mb-3">Create your own ingredients with custom nutrition data.</p>
+    <a href="{{ url_for('custom_foods.new') }}" class="btn btn-sm"
+       style="background:var(--nutri-primary); color:#fff">
+      <i class="bi bi-plus-lg me-1"></i>New Custom Food
+    </a>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

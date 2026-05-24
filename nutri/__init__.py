@@ -23,8 +23,10 @@ def create_app(test_config=None):
 
     with app.app_context():
         # Import routes
-        from .routes import main  
+        from .routes import main
         from .routes import dishes
+        from .routes.custom_foods import bp as custom_foods_bp
+        app.register_blueprint(custom_foods_bp, url_prefix='/custom-foods')
 
         db.create_all()  # Create database tables for our data models
 

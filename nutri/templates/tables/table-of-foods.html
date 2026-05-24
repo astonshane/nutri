@@ -10,14 +10,23 @@
     {% for food in foods %}
     <tr>
       <td>
+        {% if food is mapping and food.get('is_custom') %}
+        <a href="{{ url_for('custom_food_detail', dish_id=dish.id, cf_id=food['id']) }}" class="text-decoration-none fw-500" style="color:var(--nutri-dark)">
+          {{ food['food_name'] }}
+        </a>
+        {% else %}
         <a href="{{ url_for('food', id=dish.id, food_id=food.id) }}" class="text-decoration-none fw-500" style="color:var(--nutri-dark)">
           {{ food.name }}
         </a>
+        {% endif %}
       </td>
-      <td class="text-muted" style="font-size:.9rem">{{ food.brand }}</td>
+      <td class="text-muted" style="font-size:.9rem">
+        {% if food is mapping %}{{ food.get('brand_name', '') }}{% else %}{{ food.brand }}{% endif %}
+      </td>
       <td>
-        {% if food.url %}
-        <a href="{{ food.url }}" target="_blank" rel="noopener" class="text-muted" style="font-size:.85rem">
+        {% set food_url = food['food_url'] if food is mapping else food.url %}
+        {% if food_url %}
+        <a href="{{ food_url }}" target="_blank" rel="noopener" class="text-muted" style="font-size:.85rem">
           <i class="bi bi-box-arrow-up-right"></i>
         </a>
         {% endif %}

@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if custom_food %}Edit {{ custom_food.name }}{% else %}New Custom Food{% endif %}{% endblock %}
+
+{% block header %}
+<div class="page-title mb-4">
+  <h1 class="mb-1">
+    {% if custom_food %}
+      <i class="bi bi-pencil-square me-2" style="color:var(--nutri-light)"></i>Edit Custom Food
+    {% else %}
+      <i class="bi bi-plus-circle me-2" style="color:var(--nutri-light)"></i>New Custom Food
+    {% endif %}
+  </h1>
+  {% if custom_food %}
+    <p class="text-muted mb-0">{{ custom_food.name }}</p>
+  {% else %}
+    <p class="text-muted mb-0">Define a custom ingredient with your own nutrition values</p>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-6 col-md-8">
+    <div class="card">
+      <div class="card-header">
+        <i class="bi bi-bookmark-star me-1" style="color:var(--nutri-primary)"></i>
+        Food details
+      </div>
+      <div class="card-body">
+        <form method="post"
+              action="{{ url_for('custom_foods.update', id=custom_food.id) if custom_food else url_for('custom_foods.create') }}">
+
+          <div class="mb-3">
+            <label for="name" class="form-label fw-500">Name</label>
+            <input type="text" class="form-control" id="name" name="name"
+                   value="{{ custom_food.name if custom_food else '' }}"
+                   placeholder="e.g. Homemade protein powder" required autofocus>
+          </div>
+
+          <div class="mb-4">
+            <label for="serving_description" class="form-label fw-500">Serving description</label>
+            <input type="text" class="form-control" id="serving_description" name="serving_description"
+                   value="{{ custom_food.serving_description if custom_food else '' }}"
+                   placeholder="e.g. 100g, 1 scoop (30g)" required>
+            <div class="form-text">All nutrition values below are per this serving size.</div>
+          </div>
+
+          <hr class="mb-3" style="border-color:#e2e8e4">
+          <p class="text-muted mb-3" style="font-size:.82rem; text-transform:uppercase; letter-spacing:.06em; font-weight:600">
+            Nutrition per serving
+          </p>
+
+          <div class="row g-3">
+            <div class="col-sm-6">
+              <label for="calories" class="form-label fw-500">Calories <small class="text-muted fw-normal">(kcal)</small></label>
+              <input type="number" step="0.1" min="0" class="form-control" id="calories" name="calories"
+                     value="{{ custom_food.calories if custom_food else '' }}" placeholder="0" required>
+            </div>
+            <div class="col-sm-6">
+              <label for="protein" class="form-label fw-500">Protein <small class="text-muted fw-normal">(g)</small></label>
+              <input type="number" step="0.1" min="0" class="form-control" id="protein" name="protein"
+                     value="{{ custom_food.protein if custom_food else '' }}" placeholder="0" required>
+            </div>
+            <div class="col-sm-6">
+              <label for="fat" class="form-label fw-500">Fat <small class="text-muted fw-normal">(g)</small></label>
+              <input type="number" step="0.1" min="0" class="form-control" id="fat" name="fat"
+                     value="{{ custom_food.fat if custom_food else '' }}" placeholder="0" required>
+            </div>
+            <div class="col-sm-6">
+              <label for="carbohydrate" class="form-label fw-500">Carbohydrates <small class="text-muted fw-normal">(g)</small></label>
+              <input type="number" step="0.1" min="0" class="form-control" id="carbohydrate" name="carbohydrate"
+                     value="{{ custom_food.carbohydrate if custom_food else '' }}" placeholder="0" required>
+            </div>
+            <div class="col-sm-6">
+              <label for="fiber" class="form-label fw-500">Fiber <small class="text-muted fw-normal">(g)</small></label>
+              <input type="number" step="0.1" min="0" class="form-control" id="fiber" name="fiber"
+                     value="{{ custom_food.fiber if custom_food else '' }}" placeholder="0" required>
+            </div>
+            <div class="col-sm-6">
+              <label for="sodium" class="form-label fw-500">Sodium <small class="text-muted fw-normal">(mg)</small></label>
+              <input type="number" step="0.1" min="0" class="form-control" id="sodium" name="sodium"
+                     value="{{ custom_food.sodium if custom_food else '' }}" placeholder="0" required>
+            </div>
+          </div>
+
+          <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn btn-sm px-3"
+                    style="background:var(--nutri-primary); color:#fff">
+              {% if custom_food %}
+                <i class="bi bi-check-lg me-1"></i>Save Changes
+              {% else %}
+                <i class="bi bi-plus-lg me-1"></i>Create Custom Food
+              {% endif %}
+            </button>
+            <a href="{{ url_for('custom_foods.index') }}" class="btn btn-outline-secondary btn-sm px-3">
+              Cancel
+            </a>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
