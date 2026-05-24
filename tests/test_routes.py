@@ -362,6 +362,113 @@ class TestCustomFoodDelete:
             assert ing.custom_food_id is None
 
 
+class TestCustomFoodDetailRoute:
+    """Tests for GET /dishes/<dish_id>/ingredients/custom/<cf_id>."""
+
+    def test_get_returns_200(self, client, dish, custom_food):
+        resp = client.get(f'/dishes/{dish}/ingredients/custom/{custom_food}')
+        assert resp.status_code == 200
+
+    def test_get_unknown_dish_returns_404(self, client, custom_food):
+        resp = client.get(f'/dishes/9999/ingredients/custom/{custom_food}')
+        assert resp.status_code == 404
+
+    def test_get_unknown_custom_food_returns_404(self, client, dish):
+        resp = client.get(f'/dishes/{dish}/ingredients/custom/9999')
+        assert resp.status_code == 404
+
+
+class TestInsertCustomIngredient:
+    """Tests for POST /dishes/<dish_id>/ingredients/custom/<cf_id>/insert."""
+
+    def test_post_creates_ingredient_with_correct_snapshot(self, client, dish, custom_food, app):
+        resp = client.post(
+            f'/dishes/{dish}/ingredients/custom/{custom_food}/insert',
+            data={'quantity': '2.5'},
+        )
+        assert resp.status_code == 302
+        with app.app_context():
+            ing = _db.session.execute(_db.select(Ingredient)).scalar_one()
+            assert ing.custom_food_id == custom_food
+            assert ing.food_id is None
+            assert ing.serving_id is None
+            assert ing.food_name == 'Test Oat'
+            assert ing.serving_description == '100g'
+            assert ing.quantity == 2.5
+            assert ing.calories == 100.0
+            assert ing.fat == 2.5
+            assert ing.sodium == 50.0
+            assert ing.carbohydrate == 10.0
+            assert ing.fiber == 1.0
+            assert ing.protein == 5.0
+
+    def test_post_defaults_quantity_to_1_if_invalid(self, client, dish, custom_food, app):
+        resp = client.post(
+            f'/dishes/{dish}/ingredients/custom/{custom_food}/insert',
+            data={'quantity': 'bad'},
+        )
+        assert resp.status_code == 302
+        with app.app_context():
+            ing = _db.session.execute(_db.select(Ingredient)).scalar_one()
+            assert ing.quantity == 1.0
+
+    def test_post_redirects_to_dish_page(self, client, dish, custom_food):
+        resp = client.post(
+            f'/dishes/{dish}/ingredients/custom/{custom_food}/insert',
+            data={'quantity': '1'},
+        )
+        assert resp.status_code == 302
+        assert f'/dish/{dish}' in resp.headers['Location']
+
+    def test_post_unknown_dish_returns_404(self, client, custom_food):
+        resp = client.post(
+            f'/dishes/9999/ingredients/custom/{custom_food}/insert',
+            data={'quantity': '1'},
+        )
+        assert resp.status_code == 404
+
+    def test_post_unknown_custom_food_returns_404(self, client, dish):
+        resp = client.post(
+            f'/dishes/{dish}/ingredients/custom/9999/insert',
+            data={'quantity': '1'},
+        )
+        assert resp.status_code == 404
+
+
+class TestSearchIngredientsCustomFoods:
+    """Tests that search_ingredients includes custom food matches."""
+
+    def test_custom_food_appears_in_search_results(self, client, dish, custom_food):
+        with patch('nutri.routes.dishes.fs') as mock_fs:
+            mock_fs.search.return_value = []
+            resp = client.post(
+                f'/dishes/{dish}/ingredients',
+                data={'search_expression': 'Oat'},
+            )
+        assert resp.status_code == 200
+        assert b'Test Oat' in resp.data
+
+    def test_custom_food_results_returned_even_if_fatsecret_fails(self, client, dish, custom_food):
+        with patch('nutri.routes.dishes.fs') as mock_fs:
+            mock_fs.search.side_effect = Exception('API error')
+            resp = client.post(
+                f'/dishes/{dish}/ingredients',
+                data={'search_expression': 'Oat'},
+            )
+        assert resp.status_code == 200
+        assert b'Test Oat' in resp.data
+
+    def test_no_custom_food_match_returns_only_fatsecret_results(self, client, dish, custom_food):
+        with patch('nutri.routes.dishes.fs') as mock_fs:
+            mock_fs.search.return_value = []
+            resp = client.post(
+                f'/dishes/{dish}/ingredients',
+                data={'search_expression': 'xyznomatch'},
+            )
+        assert resp.status_code == 200
+        assert b'Test Oat' not in resp.data
+
+
 class TestCustomFoodDuplicateName:
     def test_create_duplicate_name_redirects_with_error(self, client, custom_food, app):
         """Creating a CustomFood with a duplicate name flashes an error and does not create a second row."""

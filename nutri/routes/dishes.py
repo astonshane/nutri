@@ -2,7 +2,7 @@ from flask import current_app as app
 from flask import flash, make_response, redirect, render_template, request, url_for
 
 from ..helpers import static_nutrition_info
-from ..models import Dish, Ingredient, db, fs
+from ..models import CustomFood, Dish, Ingredient, db, fs
 
 def list_dishes():
     """List all dishes."""
@@ -114,6 +114,44 @@ def delete_ingredient(id):
     return redirect(url_for("dish", id=dish_id))
 
 
+@app.route("/dishes/<int:dish_id>/ingredients/custom/<int:cf_id>", methods=["GET"])
+def custom_food_detail(dish_id, cf_id):
+    dish = db.session.get(Dish, dish_id)
+    if not dish:
+        return make_response("Dish not found", 404)
+    custom_food = db.session.get(CustomFood, cf_id)
+    if not custom_food:
+        return make_response("Custom food not found", 404)
+    return render_template('custom_foods/detail.html', dish=dish, custom_food=custom_food)
+
+
+@app.route("/dishes/<int:dish_id>/ingredients/custom/<int:cf_id>/insert", methods=["POST"])
+def insert_custom_ingredient(dish_id, cf_id):
+    dish = db.session.get(Dish, dish_id)
+    if not dish:
+        return make_response("Dish not found", 404)
+    custom_food = db.session.get(CustomFood, cf_id)
+    if not custom_food:
+        return make_response("Custom food not found", 404)
+    try:
+        quantity = float(request.form.get('quantity', 1.0))
+    except (ValueError, TypeError):
+        quantity = 1.0
+    ingredient = Ingredient(
+        dish_id=dish.id,
+        food_id=None,
+        serving_id=None,
+        custom_food_id=custom_food.id,
+        food_name=custom_food.name,
+        serving_description=custom_food.serving_description,
+        quantity=quantity,
+        **{key: getattr(custom_food, key) for key in static_nutrition_info.keys()}
+    )
+    db.session.add(ingredient)
+    db.session.commit()
+    return redirect(url_for('dish', id=dish_id))
+
+
 @app.route("/dishes/<int:id>/ingredients", methods=["GET", "POST"])
 def search_ingredients(id):
     dish = db.session.get(Dish, id)
@@ -123,14 +161,37 @@ def search_ingredients(id):
     if request.method == "POST":
         search_expression = request.form.get("search_expression", "")
         page = max(0, min(int(request.form.get("page", 0)), 100))
-        results = fs.search(search_expression, max_results=50, page_number=page)
+
+        # Query custom foods first so they appear even if FatSecret fails
+        custom_results = CustomFood.query.filter(
+            CustomFood.name.ilike(f'%{search_expression}%')
+        ).all()
+        custom_food_results = [
+            {
+                'is_custom': True,
+                'id': cf.id,
+                'food_name': cf.name,
+                'food_url': None,
+                'brand_name': 'Custom',
+            }
+            for cf in custom_results
+        ]
+
+        try:
+            fs_results = fs.search(search_expression, max_results=50, page_number=page)
+        except Exception:
+            fs_results = []
+
+        # Combine: custom foods first, then FatSecret results
+        all_results = custom_food_results + fs_results
+
         return render_template(
             'search.html',
             search_expression=search_expression,
-            foods=results,
+            foods=all_results,
             dish=dish,
             page=page,
-            has_next=len(results) == 50,
+            has_next=len(fs_results) == 50,
         )
 
     return render_template('search.html', dish=dish)
