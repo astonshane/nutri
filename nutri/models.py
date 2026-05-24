@@ -1,6 +1,26 @@
 from . import db, fs
 from .helpers import BaseModel, static_nutrition_info
 
+
+class CustomFood(BaseModel, db.Model):
+    __tablename__ = 'custom_food'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=False)
+    serving_description = db.Column(db.String, nullable=False)
+    calories = db.Column(db.Float, nullable=False)
+    fat = db.Column(db.Float, nullable=False)
+    sodium = db.Column(db.Float, nullable=False)
+    carbohydrate = db.Column(db.Float, nullable=False)
+    fiber = db.Column(db.Float, nullable=False)
+    protein = db.Column(db.Float, nullable=False)
+
+    ingredients = db.relationship('Ingredient', backref='custom_food', lazy=True)
+
+    def __repr__(self):
+        return f"<CustomFood id={self.id}, name={self.name}>"
+
+
 class Dish(BaseModel, db.Model):
     __tablename__ = "dishes"
 
@@ -34,8 +54,9 @@ class Ingredient(BaseModel, db.Model):
     __tablename__ = "ingredients"
 
     id = db.Column(db.Integer, primary_key=True)
-    food_id = db.Column(db.Integer, nullable=False)
-    serving_id = db.Column(db.Integer, nullable=False)
+    food_id = db.Column(db.Integer, nullable=True)
+    serving_id = db.Column(db.Integer, nullable=True)
+    custom_food_id = db.Column(db.Integer, db.ForeignKey('custom_food.id'), nullable=True)
     quantity = db.Column(db.Float, nullable=False)
     dish_id = db.Column(db.Integer, db.ForeignKey('dishes.id'), nullable=False)
     food_name = db.Column(db.String(255))

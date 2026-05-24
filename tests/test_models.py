@@ -1,6 +1,7 @@
 """Unit tests for Dish and Ingredient nutrition calculation logic."""
 import pytest
-from nutri.models import Dish, Ingredient
+from nutri import db as _db
+from nutri.models import CustomFood, Dish, Ingredient
 
 
 def make_ingredient(**kwargs):
@@ -97,3 +98,169 @@ class TestDishNutritionPerPortion:
             dish.ingredients = [make_ingredient(quantity=1.0, calories=200.0)]
             # `or 1` guard prevents division by zero
             assert dish.nutrition_per_portion()["calories"] == 200.0
+
+
+def make_custom_food(**kwargs):
+    defaults = dict(
+        name="Test Food",
+        serving_description="100g",
+        calories=100.0,
+        fat=2.0,
+        sodium=50.0,
+        carbohydrate=10.0,
+        fiber=1.0,
+        protein=8.0,
+    )
+    defaults.update(kwargs)
+    return CustomFood(**defaults)
+
+
+class TestCustomFoodCreation:
+    def test_creates_with_required_fields(self, app):
+        with app.app_context():
+            cf = make_custom_food()
+            assert cf.name == "Test Food"
+            assert cf.serving_description == "100g"
+
+    def test_repr(self, app):
+        with app.app_context():
+            cf = make_custom_food(name="Oats")
+            # id is None before DB flush, but repr should not raise
+            assert "Oats" in repr(cf)
+
+    def test_persists_to_db(self, app):
+        with app.app_context():
+            cf = make_custom_food(name="Brown Rice")
+            _db.session.add(cf)
+            _db.session.commit()
+            fetched = _db.session.get(CustomFood, cf.id)
+            assert fetched.name == "Brown Rice"
+
+    def test_all_nutrition_fields_stored(self, app):
+        with app.app_context():
+            cf = make_custom_food(
+                calories=200.0, fat=5.0, sodium=120.0,
+                carbohydrate=30.0, fiber=3.0, protein=15.0,
+            )
+            _db.session.add(cf)
+            _db.session.commit()
+            fetched = _db.session.get(CustomFood, cf.id)
+            assert fetched.calories == 200.0
+            assert fetched.fat == 5.0
+            assert fetched.sodium == 120.0
+            assert fetched.carbohydrate == 30.0
+            assert fetched.fiber == 3.0
+            assert fetched.protein == 15.0
+
+
+class TestCustomFoodNutritionFields:
+    def test_all_six_nutrition_fields_present(self, app):
+        with app.app_context():
+            cf = make_custom_food()
+            for field in ("calories", "fat", "sodium", "carbohydrate", "fiber", "protein"):
+                assert hasattr(cf, field), f"Missing field: {field}"
+
+    def test_inherits_base_model_methods(self, app):
+        with app.app_context():
+            cf = make_custom_food()
+            assert "calories" in cf.static_nutrition_keys()
+            assert cf.static_nutrition_label("calories") == "Cal (kcal)"
+
+    def test_fractional_nutrition_values(self, app):
+        with app.app_context():
+            cf = make_custom_food(calories=99.9, fat=1.5, protein=7.3)
+            _db.session.add(cf)
+            _db.session.commit()
+            fetched = _db.session.get(CustomFood, cf.id)
+            assert abs(fetched.calories - 99.9) < 0.001
+            assert abs(fetched.fat - 1.5) < 0.001
+            assert abs(fetched.protein - 7.3) < 0.001
+
+
+class TestCustomFoodIngredientRelationship:
+    def test_ingredient_linked_to_custom_food(self, app):
+        with app.app_context():
+            # Create a dish and a custom food
+            dish = Dish(title="Custom Dish", portions=1)
+            _db.session.add(dish)
+            _db.session.flush()
+
+            cf = make_custom_food(name="Homemade Sauce")
+            _db.session.add(cf)
+            _db.session.flush()
+
+            ing = Ingredient(
+                custom_food_id=cf.id,
+                quantity=2.0,
+                dish_id=dish.id,
+                food_name="Homemade Sauce",
+                serving_description="100g",
+                calories=50.0,
+                fat=1.0,
+                sodium=20.0,
+                carbohydrate=8.0,
+                fiber=0.5,
+                protein=3.0,
+            )
+            _db.session.add(ing)
+            _db.session.commit()
+
+            fetched_ing = _db.session.get(Ingredient, ing.id)
+            assert fetched_ing.custom_food_id == cf.id
+            assert fetched_ing.food_id is None
+            assert fetched_ing.serving_id is None
+
+    def test_custom_food_has_ingredients_backref(self, app):
+        with app.app_context():
+            dish = Dish(title="Backref Dish", portions=1)
+            _db.session.add(dish)
+            _db.session.flush()
+
+            cf = make_custom_food(name="My Dressing")
+            _db.session.add(cf)
+            _db.session.flush()
+
+            ing = Ingredient(
+                custom_food_id=cf.id,
+                quantity=1.0,
+                dish_id=dish.id,
+                food_name="My Dressing",
+                serving_description="1 tbsp",
+                calories=45.0,
+                fat=4.5,
+                sodium=90.0,
+                carbohydrate=1.0,
+                fiber=0.0,
+                protein=0.5,
+            )
+            _db.session.add(ing)
+            _db.session.commit()
+
+            fetched_cf = _db.session.get(CustomFood, cf.id)
+            assert len(fetched_cf.ingredients) == 1
+            assert fetched_cf.ingredients[0].id == ing.id
+
+    def test_ingredient_without_custom_food_has_none(self, app):
+        with app.app_context():
+            dish = Dish(title="Standard Dish", portions=1)
+            _db.session.add(dish)
+            _db.session.flush()
+
+            ing = Ingredient(
+                food_id=42,
+                serving_id=99,
+                quantity=1.0,
+                dish_id=dish.id,
+                calories=100.0,
+                fat=2.0,
+                sodium=30.0,
+                carbohydrate=15.0,
+                fiber=1.0,
+                protein=5.0,
+            )
+            _db.session.add(ing)
+            _db.session.commit()
+
+            fetched = _db.session.get(Ingredient, ing.id)
+            assert fetched.custom_food_id is None
+            assert fetched.food_id == 42
